@@ -4,9 +4,9 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #242424;
   font-family: 'Public Sans', sans-serif;
   color: #050100;
+  background-color: #242424;
 }
 
 /* nav */
@@ -56,4 +56,9 @@ a.about:hover {
   text-decoration: underline;
   text-underline-offset: 6px;     
   text-decoration-thickness: 2px;  
+}
+div.hero {
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(to bottom, #061303 0%, #0d280571 100%);
 }
