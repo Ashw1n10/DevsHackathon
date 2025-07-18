@@ -113,8 +113,8 @@ h1 {
   cursor: pointer;
   color: #050100;
   font-size: 18px;
-  box-shadow: 2px 2px 12px #c5c5c5d3, -2px -2px 10px #ffffffd0;
-  animation: getStarted-pulse 2s ease-in-out infinite alternate;
+  box-shadow: 2px 2px 12px #c5c5c53f, -2px -2px 10px #ffffff59;
+  /* animation: getStarted-pulse 2s ease-in-out infinite alternate; */
   opacity: 1;
   transition: 0.3s;
 }
@@ -123,7 +123,7 @@ h1 {
   transition:  0.3s;
 }
 
-@keyframes getStarted-pulse {
+/* @keyframes getStarted-pulse {
   0% {
     box-shadow: 2px 2px 12px #c5c5c5d3, -2px -2px 10px #ffffffd0;
   }
@@ -131,7 +131,7 @@ h1 {
   100% {
     box-shadow: 2px 2px 12px #c5c5c500, -2px -2px 10px #ffffff00;
   }
-}
+} */
 
 
 /* .buttonText {
