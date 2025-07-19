@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import styles from './styles/MatchProfilePopup.module.css';
 import BoxList from './BoxList';
 
-function MatchesPage() {
+function MatchProfilePopup({ onClose }) {
   // Placeholder data
   const artists = [
     { name: 'Taylor Swift' },
@@ -29,7 +29,7 @@ function MatchesPage() {
   return (
     <>
       <div className={styles.popupContainer}>
-        <button className={styles.closeBtn}>X</button>
+        <button className={styles.closeBtn} onClick={onClose}>X</button>
         <p className={styles.foundText}>You've found a match!</p>
         <p className={styles.userText}>@MyNewGirlfriend</p>
         <p className={styles.percent}>99% Match</p>
@@ -41,9 +41,18 @@ function MatchesPage() {
         <BoxList items={genres} type="genre" />
         <p className={styles.subheading}>Matching Songs</p>
         <BoxList items={songs} type="song" />
+        <div className={styles.btns}>
+          <div>
+          <button className={styles.matchBtn}  onClick={onClose}>Match</button>
+          </div>
+          <div>
+          <button className={styles.rejectBtn}  onClick={onClose}>Reject</button>
+          </div>
+        </div>
+
       </div>
     </>
   );
 }
 
-export default MatchesPage;
+export default MatchProfilePopup;

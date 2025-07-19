@@ -3,7 +3,7 @@ import styles from './styles/MatchesPage.module.css';
 import Logo from './assets/Logo.png'
 import PersonIcon from '@mui/icons-material/Person';
 import Disc from './assets/MusicDisc.png'
-import MatchPopup from './MatchProfilePopup.jsx'
+import MatchProfilePopup from './MatchProfilePopup.jsx'
 
 
 
@@ -13,6 +13,7 @@ function MatchesPage() {
   const [spinsLeft, setSpinsLeft] = useState(5);
   const [lastSpinDate, setLastSpinDate] = useState('');
   const [timeUntilNextDay, setTimeUntilNextDay] = useState('');
+  const [showPopup, setShowPopup] = useState(false);
 
   // Calculate time until next day
   const calculateTimeUntilNextDay = () => {
@@ -65,6 +66,7 @@ function MatchesPage() {
   }, []);
 
   const handleDiscClick = () => {
+    if (showPopup) return;
     if (!isSpinning && spinsLeft > 0) {
       setIsSpinning(true);
       const newSpinsLeft = spinsLeft - 1;
@@ -73,6 +75,7 @@ function MatchesPage() {
       
       setTimeout(() => {
         setIsSpinning(false);
+        setShowPopup(true);
         setSpun(true);
       }, 5000);
     }
@@ -118,7 +121,9 @@ function MatchesPage() {
         )}
       </div>
 
-      <MatchPopup />
+      {showPopup && (
+        <MatchProfilePopup onClose={() => setShowPopup(false)} />
+      )}
 
     </>
   )

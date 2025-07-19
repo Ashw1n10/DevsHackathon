@@ -6,7 +6,6 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%);
     font-family: 'Public Sans', sans-serif;
     color: #050100;
     overflow-y: auto;
@@ -132,4 +131,55 @@ div.break {
   .popupContainer {
     -ms-overflow-style: none; 
     scrollbar-width: none; 
+    transform: translate(-50%,-50%) scale(0);
+    opacity: 0;
+    animation: expand-popup 0.5s ease-in-out forwards;
+    transform-origin: center;
   } 
+
+  @keyframes expand-popup {
+    0% {
+        opacity: 0;
+        transform: translate(-50%,-50%) scale(0);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%,-50%) scale(1);
+    }
+  }
+  .btns {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+    margin: auto;
+    margin-bottom: 20px;
+  }
+  .btns button {
+    border: 0;
+    width: 350px;
+    height: 40px;
+    border-radius: 10px;
+    padding: 10px 10px;
+    font-size: 16px;
+  }
+
+  .btns button:hover {
+    opacity: 0.8;
+    cursor: pointer;
+  }
+
+  .matchBtn {
+    background-color: #16D360;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .rejectBtn {
+    background-color: #ed2222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
