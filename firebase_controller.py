@@ -96,16 +96,28 @@ def get_user_spotify_data(user_id):
         user_id (str): User identifier
         
     Returns:
-        dict: User's Spotify data or None if not found
+        dict: User's Spotify data in formatted structure or None if not found
     """
     try:
         user_ref = db.collection('user_collection').document(user_id)
         doc = user_ref.get()
         
         if doc.exists:
-            user_data = doc.to_dict()
+            raw_data = doc.to_dict()
             print(f"📖 Retrieved data for user: {user_id}")
-            return user_data
+            
+            # Format the data in the requested structure
+            formatted_data = {
+                "valence": raw_data.get('valence', 0.0),
+                "energy": raw_data.get('energy', 0.0),
+                "danceability": raw_data.get('danceability', 0.0),
+                "tempo": raw_data.get('tempo', 0.0),
+                "instrumentalness": raw_data.get('instrumentalness', 0.0),
+                "top_genres": raw_data.get('top_genres', []),
+                "top_artists": raw_data.get('top_artists', [])
+            }
+            
+            return formatted_data
         else:
             print(f"❌ No data found for user: {user_id}")
             return None

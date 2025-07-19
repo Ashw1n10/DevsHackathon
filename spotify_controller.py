@@ -7,7 +7,7 @@ from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.cache_handler import FlaskSessionCacheHandler
 
-from firebase_controller import add_spotify_data_to_firebase
+from firebase_controller import add_spotify_data_to_firebase, get_user_spotify_data
 
 # === Replace with your Spotify app credentials ===
 CLIENT_ID = '01b47c0963834b1f9869b3cc8fb122a7'
@@ -291,6 +291,15 @@ def get_songs():
         </body>
         </html>
         """
+        
+        # Print the formatted user data after HTML is created
+        if firebase_response.get('success') and firebase_response.get('user_id'):
+            user_data = get_user_spotify_data(firebase_response['user_id'])
+            if user_data:
+                print("\n=== FORMATTED USER DATA ===")
+                print(f"User ID: {firebase_response['user_id']}")
+                print(f"Data: {user_data}")
+                print("===========================\n")
         
         return html_content
         
