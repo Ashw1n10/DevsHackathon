@@ -65,25 +65,52 @@ def get_songs():
             }
             songs_info.append(song_data)
         
+        # Get top artists to extract genres
+        artists = sp.current_user_top_artists(limit=20, time_range='medium_term')
+        
+        # Extract and count genres
+        genre_count = {}
+        for artist in artists['items']:
+            for genre in artist['genres']:
+                genre_count[genre] = genre_count.get(genre, 0) + 1
+        
+        # Get top 5 genres
+        top_genres = sorted(genre_count.items(), key=lambda x: x[1], reverse=True)[:5]
+        
+        genres_info = []
+        for idx, (genre, count) in enumerate(top_genres, 1):
+            genre_data = {
+                'rank': idx,
+                'name': genre.title(),  # Capitalize genre name
+                'count': count,
+                'percentage': round((count / len(artists['items'])) * 100, 1)
+            }
+            genres_info.append(genre_data)
+        
         # Create HTML response
         html_content = """
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Your Top 5 Spotify Tracks</title>
+            <title>Your Spotify Music Profile</title>
             <style>
                 body { font-family: Arial, sans-serif; margin: 40px; background-color: #191414; color: #1db954; }
-                h1 { text-align: center; color: #1db954; }
-                .track { background-color: #282828; margin: 10px 0; padding: 15px; border-radius: 8px; }
-                .track-name { font-size: 18px; font-weight: bold; color: #ffffff; }
-                .track-artist { color: #b3b3b3; margin: 5px 0; }
+                h1, h2 { text-align: center; color: #1db954; }
+                h2 { margin-top: 40px; margin-bottom: 20px; }
+                .track, .genre { background-color: #282828; margin: 10px 0; padding: 15px; border-radius: 8px; }
+                .track-name, .genre-name { font-size: 18px; font-weight: bold; color: #ffffff; }
+                .track-artist, .genre-stats { color: #b3b3b3; margin: 5px 0; }
                 .track-details { color: #b3b3b3; font-size: 14px; }
                 a { color: #1db954; text-decoration: none; }
                 a:hover { text-decoration: underline; }
+                .section { margin-bottom: 50px; }
             </style>
         </head>
         <body>
-            <h1>🎵 Your Top 5 Spotify Tracks</h1>
+            <h1>🎵 Your Spotify Music Profile</h1>
+            
+            <div class="section">
+                <h2>🎶 Your Top 5 Tracks</h2>
         """
         
         for song in songs_info:
@@ -99,6 +126,24 @@ def get_songs():
             """
         
         html_content += """
+            </div>
+            
+            <div class="section">
+                <h2>🎭 Your Top 5 Genres</h2>
+        """
+        
+        for genre in genres_info:
+            html_content += f"""
+            <div class="genre">
+                <div class="genre-name">#{genre['rank']} {genre['name']}</div>
+                <div class="genre-stats">
+                    Found in {genre['count']} of your top artists ({genre['percentage']}%)
+                </div>
+            </div>
+            """
+        
+        html_content += """
+            </div>
         </body>
         </html>
         """
