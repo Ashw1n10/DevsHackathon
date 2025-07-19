@@ -3,8 +3,7 @@ import styles from './styles/LandingPage.module.css';
 import LogIn from './LogIn';
 import SignUp from './SignUp';
 // import { useState } from 'react'
-import styles from './styles/LandingPage.module.css'
-import Logo from './assets/Logo.png'
+import Logo from './assets/Logo.png'; 
 
 
 function App() {
