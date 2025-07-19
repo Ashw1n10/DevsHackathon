@@ -4,6 +4,7 @@ body {
     font-family: 'Public Sans', sans-serif;
     color: #050100;
     background-color: #242424;
+    overflow: hidden;
   }
 
   .background {
