@@ -2,7 +2,7 @@ import React from 'react'
 import './styles/UserProfile.css'
 import Logo from './assets/Logo.png'
 
-function UserProfile() {
+function UserProfile({ onNavigate = () => {} }) {
   // Placeholder data for top 10 artists
   const topArtists = [
     { rank: 1, name: "The Weeknd", genres: ["Pop", "R&B", "Alternative R&B"], popularity: 100, followers: 15234567 },
@@ -38,7 +38,8 @@ function UserProfile() {
           <div>
             <img src={Logo} alt="Logo" className="logo" />
           </div>
-          <a href="" className="about">About</a>
+          <button onClick={() => onNavigate('landing')} className="about">Home</button>
+          <button onClick={() => onNavigate('chat')} className="about">💬 Chat</button>
         </div>
         <button className="login">Login</button>
       </div>

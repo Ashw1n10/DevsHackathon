@@ -2,7 +2,7 @@
 import './styles/LandingPage.css'
 import Logo from './assets/Logo.png'
 
-function App() {
+function LandingPage({ onNavigate = () => {} }) {
 
   return (
     <>
@@ -11,7 +11,8 @@ function App() {
           <div>
             <img src={Logo} alt="Logo" className="logo" />
           </div>
-          <a href="" className="about">About</a>
+          <button onClick={() => onNavigate('profile')} className="about">Profile</button>
+          <button onClick={() => onNavigate('chat')} className="about">💬 Chat</button>
         </div>
         <button className="login">Login</button>
       </div>
@@ -19,7 +20,7 @@ function App() {
         <div className="header">
           <h1>Find your perfect match through <span className='gradient'>music</span>.</h1>
           <div className="getStarted">
-            <button><span class="buttonText">Get Started</span></button>
+            <button onClick={() => onNavigate('profile')}><span className="buttonText">Get Started</span></button>
           </div>
         </div>
 
@@ -28,4 +29,4 @@ function App() {
   )
 }
 
-export default App
+export default LandingPage
