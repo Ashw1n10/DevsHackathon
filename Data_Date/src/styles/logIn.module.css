@@ -1,0 +1,94 @@
+
+.modal{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modalContent{
+    height: auto;
+    max-width: 40vw;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 40px; 
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.logInContainer {
+    width: 100%;
+    max-width: 80%; /* constrain it */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.usernameInput, .passwordInput {
+    width: 80%;
+    font-size: 16px;
+    padding: 20px 0px 20px 6px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+
+}
+
+button.logInButton {
+  padding: 12px 28px;
+  border-radius: 10px;
+  border: 0;
+  background-color: #fff;
+  color: #050100;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+button.loginButton:hover {
+  background-color: #16d35ee7;
+  color: #fff;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+
+.img.logo, .passwordInput, .usernameInput, .registerText, .logInButton {
+    
+    margin: 15px;
+}
+
+.registerText{
+    text-align: center;
+    color: white;
+    font-size: 18px;
+    text-decoration: none;
+}
+
+
+.registerLink {
+    text-decoration: none;
+    color: #16d360;
+    font-weight: bold;
+}
+
+.img.logo {
+
+    width: 60%;
+    max-width: 180px;
+    height: auto;
+    display: block;
+    margin-bottom: 24px;
+  /* width: 124px;
+  height: 32px; */
+}
+
