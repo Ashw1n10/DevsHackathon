@@ -35,7 +35,7 @@ initialize_firebase()
 # Initialize Firestore client
 db = firestore.client()
 
-def add_spotify_data_to_firebase(top_artists_array, top_genres_array, valence, energy, danceability, tempo, instrumentalness, user_id=None):
+def add_spotify_data_to_firebase(top_songs_array, top_artists_array, top_genres_array, valence, energy, danceability, tempo, instrumentalness, user_id=None):
     """
     Add top artists and genres arrays to Firestore separately
     
@@ -57,6 +57,7 @@ def add_spotify_data_to_firebase(top_artists_array, top_genres_array, valence, e
         
         # Create the data structure for Firestore
         user_data = {
+            'top_songs': top_songs_array,
             'top_artists': top_artists_array,
             'top_genres': top_genres_array, 
             'valence' : valence, 
@@ -114,7 +115,8 @@ def get_user_spotify_data(user_id):
                 "tempo": raw_data.get('tempo', 0.0),
                 "instrumentalness": raw_data.get('instrumentalness', 0.0),
                 "top_genres": raw_data.get('top_genres', []),
-                "top_artists": raw_data.get('top_artists', [])
+                "top_artists": raw_data.get('top_artists', []),
+                "top_songs": raw_data.get('top_songs', [])
             }
             
             return formatted_data
