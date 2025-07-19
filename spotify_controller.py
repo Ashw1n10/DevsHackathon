@@ -48,29 +48,26 @@ def get_songs():
         auth_url = sp_oauth.get_authorize_url()
         return redirect(auth_url)
     
-    # Get top 5 tracks
     try:
-        songs = sp.current_user_top_tracks(limit=5, time_range='medium_term')
+        # Get top artists
+        all_artists = sp.current_user_top_artists(limit=20, time_range='medium_term')
         
-        # Extract song information
-        songs_info = []
-        for idx, track in enumerate(songs['items'], 1):
-            song_data = {
+        # Extract top 5 artists information
+        artists_info = []
+        for idx, artist in enumerate(all_artists['items'][:5], 1):
+            artist_data = {
                 'rank': idx,
-                'name': track['name'],
-                'artist': ', '.join([artist['name'] for artist in track['artists']]),
-                'album': track['album']['name'],
-                'popularity': track['popularity'],
-                'external_url': track['external_urls']['spotify']
+                'name': artist['name'],
+                'genres': artist['genres'][:3] if artist['genres'] else ['No genres listed'],  # Show top 3 genres
+                'popularity': artist['popularity'],
+                'followers': artist['followers']['total'],
+                'external_url': artist['external_urls']['spotify']
             }
-            songs_info.append(song_data)
+            artists_info.append(artist_data)
         
-        # Get top artists to extract genres
-        artists = sp.current_user_top_artists(limit=20, time_range='medium_term')
-        
-        # Extract and count genres
+        # Extract and count genres from all top artists
         genre_count = {}
-        for artist in artists['items']:
+        for artist in all_artists['items']:
             for genre in artist['genres']:
                 genre_count[genre] = genre_count.get(genre, 0) + 1
         
@@ -83,9 +80,17 @@ def get_songs():
                 'rank': idx,
                 'name': genre.title(),  # Capitalize genre name
                 'count': count,
-                'percentage': round((count / len(artists['items'])) * 100, 1)
+                'percentage': round((count / len(all_artists['items'])) * 100, 1)
             }
             genres_info.append(genre_data)
+        
+        # Save to arrays for potential future use
+        top_artists_array = [artist['name'] for artist in artists_info]
+        top_genres_array = [genre['name'] for genre in genres_info]
+        
+        # Print arrays to console for debugging/verification
+        print("Top 5 Artists Array:", top_artists_array)
+        print("Top 5 Genres Array:", top_genres_array)
         
         # Create HTML response
         html_content = """
@@ -97,30 +102,31 @@ def get_songs():
                 body { font-family: Arial, sans-serif; margin: 40px; background-color: #191414; color: #1db954; }
                 h1, h2 { text-align: center; color: #1db954; }
                 h2 { margin-top: 40px; margin-bottom: 20px; }
-                .track, .genre { background-color: #282828; margin: 10px 0; padding: 15px; border-radius: 8px; }
-                .track-name, .genre-name { font-size: 18px; font-weight: bold; color: #ffffff; }
-                .track-artist, .genre-stats { color: #b3b3b3; margin: 5px 0; }
-                .track-details { color: #b3b3b3; font-size: 14px; }
+                .genre, .artist { background-color: #282828; margin: 10px 0; padding: 15px; border-radius: 8px; }
+                .genre-name, .artist-name { font-size: 18px; font-weight: bold; color: #ffffff; }
+                .genre-stats, .artist-details { color: #b3b3b3; margin: 5px 0; }
                 a { color: #1db954; text-decoration: none; }
                 a:hover { text-decoration: underline; }
                 .section { margin-bottom: 50px; }
+                .artist-genres { color: #1db954; font-size: 14px; font-style: italic; }
             </style>
         </head>
         <body>
             <h1>🎵 Your Spotify Music Profile</h1>
             
             <div class="section">
-                <h2>🎶 Your Top 5 Tracks</h2>
+                <h2>🎤 Your Top 5 Artists</h2>
         """
         
-        for song in songs_info:
+        for artist in artists_info:
+            genres_text = ", ".join(artist['genres'])
             html_content += f"""
-            <div class="track">
-                <div class="track-name">#{song['rank']} {song['name']}</div>
-                <div class="track-artist">by {song['artist']}</div>
-                <div class="track-details">
-                    Album: {song['album']} | Popularity: {song['popularity']}/100<br>
-                    <a href="{song['external_url']}" target="_blank">🎧 Listen on Spotify</a>
+            <div class="artist">
+                <div class="artist-name">#{artist['rank']} {artist['name']}</div>
+                <div class="artist-details">
+                    Popularity: {artist['popularity']}/100 | Followers: {artist['followers']:,}<br>
+                    <div class="artist-genres">Genres: {genres_text}</div>
+                    <a href="{artist['external_url']}" target="_blank">🎧 View on Spotify</a>
                 </div>
             </div>
             """
