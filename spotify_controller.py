@@ -7,6 +7,8 @@ from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.cache_handler import FlaskSessionCacheHandler
 
+from firebase_controller import add_spotify_data_to_firebase
+
 # === Replace with your Spotify app credentials ===
 CLIENT_ID = '01b47c0963834b1f9869b3cc8fb122a7'
 CLIENT_SECRET = 'b1c0561f9c6d4430852242ba917f216c'
@@ -189,6 +191,13 @@ def get_songs():
         print(f"Average Tempo: {average_tempo}")
         print(f"Average Instrumentalness: {average_instrumentalness}")
         print("================================\n")
+
+        # Add data to Firebase
+        firebase_response = add_spotify_data_to_firebase(
+            top_artists_array=top_artists_array,
+            top_genres_array=top_genres_array,
+            user_id=session.get('user_id')  # Use session user ID if available
+        )
         
         # Create HTML response
         html_content = """
