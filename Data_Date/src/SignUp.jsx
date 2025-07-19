@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import LinkSpotify from './linkSpotify';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
@@ -22,6 +23,7 @@ function SignUp({ onClose }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [spotifyLinked, setSpotifyLinked] = useState(false);
+    const [showLinkSpotify, setShowLinkSpotify] = useState(false);
 
     // Handle input changes
     const handleInputChange = (e) => {
@@ -57,11 +59,9 @@ function SignUp({ onClose }) {
         return true;
     };
 
-    // Handle Spotify linking
+    // Handle Spotify linking (not used directly anymore)
     const handleLinkSpotify = () => {
-        // Redirect to your Flask backend for Spotify authentication
-        window.open('http://127.0.0.1:5000/', '_blank');
-        setSpotifyLinked(true);
+        setShowLinkSpotify(true);
     };
 
     // Handle sign up
@@ -75,6 +75,15 @@ function SignUp({ onClose }) {
 
         setLoading(true);
 
+        // Instead of creating the user now, show the LinkSpotify modal
+        setShowLinkSpotify(true);
+        console.log('SignUp button pressed, showLinkSpotify set to true');
+    };
+
+    // This will be called after Spotify linking is done
+    const handleSpotifyLinked = async () => {
+        setShowLinkSpotify(false);
+        setLoading(true);
         try {
             // Create user with Firebase Auth
             const userCredential = await createUserWithEmailAndPassword(
@@ -94,7 +103,7 @@ function SignUp({ onClose }) {
                 gender: formData.gender,
                 age: parseInt(formData.age),
                 preference: formData.preference,
-                spotifyLinked: spotifyLinked,
+                spotifyLinked: true,
                 createdAt: new Date(),
                 updatedAt: new Date()
             });
@@ -134,142 +143,118 @@ function SignUp({ onClose }) {
     };
 
     return (
-        <div className={styleSignUp.modal} onClick={handleOutsideClick}>
-            <div className={styleSignUp.modalContent}>
-                <img src={Logo} alt="Logo" className={styleSignUp.logo} />
-                <div className={styleSignUp.scrollableContent}>
-                    <div className={styleSignUp.SignUpContainer}>
-                        {error && <div className={styleSignUp.error}>{error}</div>}
-
-                        <form onSubmit={handleSignUp}>
-
-                            <input
-                                type="text"
-                                name="fullName"
-                                placeholder='Full Name'
-                                className={styleSignUp.nameInput}
-                                value={formData.fullName}
-                                onChange={handleInputChange}
-                                required
-                            />
-
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder='Email'
-                                className={styleSignUp.emailInput}
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                required
-                            />
-
-                            <div className={styleSignUp.break}></div>
-
-                            <input
-                                type="text"
-                                name="username"
-                                placeholder='Username'
-                                className={styleSignUp.usernameInput}
-                                value={formData.username}
-                                onChange={handleInputChange}
-                                required
-                            />
-
-                            <input
-                                type="password"
-                                name="password"
-                                placeholder='Password'
-                                className={styleSignUp.passwordInput}
-                                value={formData.password}
-                                onChange={handleInputChange}
-                                required
-                            />
-
-                            <input
-                                type="password"
-                                name="confirmPassword"
-                                placeholder='Confirm Password'
-                                className={styleSignUp.confirmPasswordInput}
-                                value={formData.confirmPassword}
-                                onChange={handleInputChange}
-                                required
-                            />
-
-<div className={styleSignUp.break}></div>
-
-
-
-                            <div className={styleSignUp.labelStyle}>
-                                <label htmlFor="gender" className={styleSignUp.label}>Select your gender</label>
+        <>
+            {showLinkSpotify ? (
+                <LinkSpotify 
+                    onClose={() => setShowLinkSpotify(false)}
+                    onLinked={handleSpotifyLinked}
+                />
+            ) : (
+                <div className={styleSignUp.modal + ' ' + styleSignUp.fade} onClick={handleOutsideClick}>
+                    <div className={styleSignUp.modalContent}>
+                        <img src={Logo} alt="Logo" className={styleSignUp.logo} />
+                        <div className={styleSignUp.scrollableContent}>
+                            <div className={styleSignUp.SignUpContainer}>
+                                {error && <div className={styleSignUp.error}>{error}</div>}
+                                <form onSubmit={handleSignUp}>
+                                    <input 
+                                        type="text" 
+                                        name="username"
+                                        placeholder='Enter your Username' 
+                                        className={styleSignUp.usernameInput}
+                                        value={formData.username}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                    <input 
+                                        type="password" 
+                                        name="password"
+                                        placeholder='Enter your Password' 
+                                        className={styleSignUp.passwordInput}
+                                        value={formData.password}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                    <input 
+                                        type="password" 
+                                        name="confirmPassword"
+                                        placeholder='Confirm Password' 
+                                        className={styleSignUp.confirmPasswordInput}
+                                        value={formData.confirmPassword}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                    <input 
+                                        type="email" 
+                                        name="email"
+                                        placeholder='Email' 
+                                        className={styleSignUp.emailInput}
+                                        value={formData.email}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                    <input 
+                                        type="text" 
+                                        name="fullName"
+                                        placeholder='Full Name' 
+                                        className={styleSignUp.nameInput}
+                                        value={formData.fullName}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                    <label htmlFor="gender" className={styleSignUp.label}>Select your gender</label>
+                                    <select 
+                                        name="gender" 
+                                        id="gender" 
+                                        className={styleSignUp.select}
+                                        value={formData.gender}
+                                        onChange={handleInputChange}
+                                    >
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="Non-binary">Non-binary</option>
+                                    </select>
+                                    <label htmlFor="age" className={styleSignUp.label}>Select your age</label>
+                                    <input 
+                                        type="number" 
+                                        id="age" 
+                                        name="age" 
+                                        min="18" 
+                                        max="100" 
+                                        placeholder='Age' 
+                                        className={styleSignUp.ageInput}
+                                        value={formData.age}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                    <label htmlFor="preference" className={styleSignUp.label}>Select your preference</label>
+                                    <select 
+                                        name="preference" 
+                                        id="preference" 
+                                        className={styleSignUp.select}
+                                        value={formData.preference}
+                                        onChange={handleInputChange}
+                                    >
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="Non-binary">Non-binary</option>
+                                        <option value="any">Any</option>
+                                    </select>
+                                    <button 
+                                        type="submit"
+                                        className={styleSignUp.signUpButton}
+                                        disabled={loading}
+                                    >
+                                        {loading ? 'Creating Account...' : 'Sign Up'}
+                                    </button>
+                                </form>
                             </div>
-
-                            <select
-                                name="gender"
-                                id="gender"
-                                className={styleSignUp.select}
-                                value={formData.gender}
-                                onChange={handleInputChange}
-                            >
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="Non-binary">Non-binary</option>
-                            </select>
-
-                            <div className={styleSignUp.labelStyle}>
-                                <label htmlFor="age" >Select your age</label>
-                            </div>
-
-                            <input
-                                type="number"
-                                id="age"
-                                name="age"
-                                min="18"
-                                max="100"
-                                placeholder='Age'
-                                className={styleSignUp.ageInput}
-                                value={formData.age}
-                                onChange={handleInputChange}
-                                required
-                            />
-
-                            <div className={styleSignUp.labelStyle}>
-                                <label htmlFor="preference" className={styleSignUp.label}>Select your preference</label>
-                            </div>
-
-                            <select
-                                name="preference"
-                                id="preference"
-                                className={styleSignUp.select}
-                                value={formData.preference}
-                                onChange={handleInputChange}
-                            >
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="Non-binary">Non-binary</option>
-                                <option value="any">Any</option>
-                            </select>
-
-                            <button
-                                type="button"
-                                className={styleSignUp.linkSpotifyButton}
-                                onClick={handleLinkSpotify}
-                            >
-                                {spotifyLinked ? 'Spotify Linked ✓' : 'Link Spotify'}
-                            </button>
-
-                            <button
-                                type="submit"
-                                className={styleSignUp.signUpButton}
-                                disabled={loading}
-                            >
-                                {loading ? 'Creating Account...' : 'Sign Up'}
-                            </button>
-                        </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    );
+            )}
+        </>
+    )
 }
 
 export default SignUp;
