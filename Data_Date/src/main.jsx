@@ -5,5 +5,5 @@ import LandingPage from './LandingPage.jsx'
 import SignUp from './SignUp.jsx'
 
 createRoot(document.getElementById('root')).render(
-<LandingPage />
+    <LandingPage />
 )
