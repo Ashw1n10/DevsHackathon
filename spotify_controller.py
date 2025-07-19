@@ -1,74 +1,114 @@
-import requests
-import base64
+import os 
+
+from flask import Flask, request, session, url_for, redirect
+
+from spotipy import Spotify 
+from spotipy.oauth2 import SpotifyOAuth
+from spotipy.cache_handler import FlaskSessionCacheHandler
 
 # === Replace with your Spotify app credentials ===
 CLIENT_ID = '01b47c0963834b1f9869b3cc8fb122a7'
 CLIENT_SECRET = 'b1c0561f9c6d4430852242ba917f216c'
-REDIRECT_URI = 'https://oauth.pstmn.io/v1/callback'
+REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+SCOPE = 'user-top-read'
 
-# === Step 1: Guide user to authorize ===
-print("🔗 1. Open this URL in your browser to authorize:")
-auth_url = (
-    f"https://accounts.spotify.com/authorize"
-    f"?client_id={CLIENT_ID}"
-    f"&response_type=code"
-    f"&redirect_uri={REDIRECT_URI}"
-    f"&scope=user-top-read"
-)
-print(auth_url)
+app = Flask(__name__) 
+app.config['SECRET_KEY'] = os.urandom(64) # Secret key for encryption, if we run into issues CHANGE into a fixed value
 
-# === Step 2: Get authorization code ===
-AUTH_CODE = input("\n🎫 2. After authorizing, paste the code from the URL here: ").strip()
+cache_handler = FlaskSessionCacheHandler(session)
 
-# === Step 3: Exchange code for access token ===
-auth_str = f"{CLIENT_ID}:{CLIENT_SECRET}"
-b64_auth_str = base64.b64encode(auth_str.encode()).decode()
-
-token_response = requests.post(
-    'https://accounts.spotify.com/api/token',
-    data={
-        'grant_type': 'authorization_code',
-        'code': AUTH_CODE,
-        'redirect_uri': REDIRECT_URI
-    },
-    headers={
-        'Authorization': f'Basic {b64_auth_str}',
-        'Content-Type': 'application/x-www-form-urlencoded'
-    }
+# Authentication manager 
+sp_oauth = SpotifyOAuth(
+    client_id=CLIENT_ID,
+    client_secret=CLIENT_SECRET,
+    redirect_uri=REDIRECT_URI,
+    scope=SCOPE, 
+    cache_handler=cache_handler, 
+    show_dialog=True
 )
 
-token_data = token_response.json()
-access_token = token_data.get('access_token')
+sp = Spotify(auth_manager=sp_oauth)
 
-# === Step 4: Use access token to get top artists ===
-if access_token:
-    print("\n🎧 Top 10 Spotify Artists:")
-    response = requests.get(
-        'https://api.spotify.com/v1/me/top/artists?limit=10',
-        headers={'Authorization': f'Bearer {access_token}'}
-    )
-    data = response.json()
-    print(data)  # <-- Add this to debug response
-    for idx, artist in enumerate(data.get('items', []), 1):
-        print(f"{idx}. {artist['name']}")
+# Access rules with the spotify api, flask endpoints and website navigation
+@app.route('/')
+def home(): 
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()): # Validating token
+        auth_url = sp_oauth.get_authorize_url()
+        return redirect(auth_url)
+    return redirect(url_for('get_songs'))
 
-    from collections import Counter
+@app.route('/callback') # if youve already logged in 
+def callback(): 
+    sp_oauth.get_access_token(request.args['code'])
+    return redirect(url_for('get_songs'))
 
-    # Assume `data` is the JSON response from the top artists API
+@app.route('/get_songs') 
+def get_songs(): 
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()): 
+        auth_url = sp_oauth.get_authorize_url()
+        return redirect(auth_url)
+    
+    # Get top 5 tracks
+    try:
+        songs = sp.current_user_top_tracks(limit=5, time_range='medium_term')
+        
+        # Extract song information
+        songs_info = []
+        for idx, track in enumerate(songs['items'], 1):
+            song_data = {
+                'rank': idx,
+                'name': track['name'],
+                'artist': ', '.join([artist['name'] for artist in track['artists']]),
+                'album': track['album']['name'],
+                'popularity': track['popularity'],
+                'external_url': track['external_urls']['spotify']
+            }
+            songs_info.append(song_data)
+        
+        # Create HTML response
+        html_content = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Your Top 5 Spotify Tracks</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; background-color: #191414; color: #1db954; }
+                h1 { text-align: center; color: #1db954; }
+                .track { background-color: #282828; margin: 10px 0; padding: 15px; border-radius: 8px; }
+                .track-name { font-size: 18px; font-weight: bold; color: #ffffff; }
+                .track-artist { color: #b3b3b3; margin: 5px 0; }
+                .track-details { color: #b3b3b3; font-size: 14px; }
+                a { color: #1db954; text-decoration: none; }
+                a:hover { text-decoration: underline; }
+            </style>
+        </head>
+        <body>
+            <h1>🎵 Your Top 5 Spotify Tracks</h1>
+        """
+        
+        for song in songs_info:
+            html_content += f"""
+            <div class="track">
+                <div class="track-name">#{song['rank']} {song['name']}</div>
+                <div class="track-artist">by {song['artist']}</div>
+                <div class="track-details">
+                    Album: {song['album']} | Popularity: {song['popularity']}/100<br>
+                    <a href="{song['external_url']}" target="_blank">🎧 Listen on Spotify</a>
+                </div>
+            </div>
+            """
+        
+        html_content += """
+        </body>
+        </html>
+        """
+        
+        return html_content
+        
+    except Exception as e:
+        return f"<h1>Error fetching your top tracks:</h1><p>{str(e)}</p>"
 
-    genres = []
-    for artist in data.get('items', []):
-        genres.extend(artist.get('genres', []))
 
-    # Count frequency of each genre
-    genre_counts = Counter(genres)
 
-    # Get top 10 genres
-    top_genres = genre_counts.most_common(10)
-
-    print("\n🎵 Top 10 Genres:")
-    for idx, (genre, count) in enumerate(top_genres, 1):
-        print(f"{idx}. {genre} (appears in {count} artists)")
-else:
-    print("❌ Failed to get access token.")
-    print(token_data)
+if __name__ == '__main__':
+    app.run(debug=True) 
