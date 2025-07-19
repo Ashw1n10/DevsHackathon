@@ -51,7 +51,7 @@ def get_songs():
     
     try:
         # Get top 5 tracks
-        songs = sp.current_user_top_tracks(limit=5, time_range='medium_term')
+        songs = sp.current_user_top_tracks(limit=10, time_range='medium_term')
         
         # Extract song information and get audio features
         songs_info = []
@@ -68,7 +68,7 @@ def get_songs():
             
             # Try to get audio features for individual track
             try:
-                time.sleep(0.1)  # Small delay to avoid rate limiting
+                #time.sleep(0.1)  # Small delay to avoid rate limiting
                 print(f"Trying to get features for track ID: {track['id']}")
                 features = sp.audio_features([track['id']])[0]  # Get first item from list
                 print(f"Raw features response: {features}")
@@ -115,9 +115,9 @@ def get_songs():
         # Get top artists
         all_artists = sp.current_user_top_artists(limit=20, time_range='medium_term')
         
-        # Extract top 5 artists information
+        # Extract top 10 artists information
         artists_info = []
-        for idx, artist in enumerate(all_artists['items'][:5], 1):
+        for idx, artist in enumerate(all_artists['items'][:10], 1):
             artist_data = {
                 'rank': idx,
                 'name': artist['name'],
@@ -133,10 +133,10 @@ def get_songs():
         for artist in all_artists['items']:
             for genre in artist['genres']:
                 genre_count[genre] = genre_count.get(genre, 0) + 1
-        
-        # Get top 5 genres
-        top_genres = sorted(genre_count.items(), key=lambda x: x[1], reverse=True)[:5]
-        
+
+        # Get top 10 genres
+        top_genres = sorted(genre_count.items(), key=lambda x: x[1], reverse=True)[:10]
+
         genres_info = []
         for idx, (genre, count) in enumerate(top_genres, 1):
             genre_data = {
@@ -159,6 +159,18 @@ def get_songs():
         tempo_array = [song['tempo'] for song in songs_info]
         instrumentalness_array = [song['instrumentalness'] for song in songs_info]
         
+        # Calculate averages for audio features (only for numeric values, skip 'N/A')
+        def calculate_average(arr):
+            numeric_values = [val for val in arr if isinstance(val, (int, float))]
+            return round(sum(numeric_values) / len(numeric_values), 3) if numeric_values else 0.0
+        
+        # Audio feature averages saved as decimals
+        average_valence = calculate_average(valence_array)
+        average_energy = calculate_average(energy_array)
+        average_danceability = calculate_average(danceability_array)
+        average_tempo = calculate_average(tempo_array)
+        average_instrumentalness = calculate_average(instrumentalness_array)
+        
         # Print arrays to console for debugging/verification
         print("Top 5 Songs Array:", top_songs_array)
         print("Top 5 Artists Array:", top_artists_array)
@@ -168,6 +180,15 @@ def get_songs():
         print("Danceability Array:", danceability_array)
         print("Tempo Array:", tempo_array)
         print("Instrumentalness Array:", instrumentalness_array)
+        
+        # Print averages
+        print("\n=== AUDIO FEATURE AVERAGES ===")
+        print(f"Average Valence: {average_valence}")
+        print(f"Average Energy: {average_energy}")
+        print(f"Average Danceability: {average_danceability}")
+        print(f"Average Tempo: {average_tempo}")
+        print(f"Average Instrumentalness: {average_instrumentalness}")
+        print("================================\n")
         
         # Create HTML response
         html_content = """
