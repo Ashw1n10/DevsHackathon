@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import LinkSpotify from './linkSpotify';
+import LinkSpotify from './LinkSpotify';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
@@ -74,13 +74,60 @@ function SignUp({ onClose }) {
         }
 
         setLoading(true);
+        try {
+            // Create user with Firebase Auth
+            const userCredential = await createUserWithEmailAndPassword(
+                auth,
+                formData.email,
+                formData.password
+            );
 
-        // Instead of creating the user now, show the LinkSpotify modal
-        setShowLinkSpotify(true);
-        console.log('SignUp button pressed, showLinkSpotify set to true');
+            const user = userCredential.user;
+
+            // Save additional user data to Firestore
+            await setDoc(doc(db, 'users', user.uid), {
+                uid: user.uid,
+                username: formData.username,
+                email: formData.email,
+                fullName: formData.fullName,
+                gender: formData.gender,
+                age: parseInt(formData.age),
+                preference: formData.preference,
+                spotifyLinked: true,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            });
+
+            console.log('User created successfully:', user.uid);
+
+
+            // Instead of creating the user now, show the LinkSpotify modal
+            setShowLinkSpotify(true);
+            console.log('SignUp button pressed, showLinkSpotify set to true');
+
+        } catch (error) {
+            console.error('Error creating user:', error);
+
+            // Handle specific Firebase errors
+            switch (error.code) {
+                case 'auth/email-already-in-use':
+                    setError('This email is already registered');
+                    break;
+                case 'auth/invalid-email':
+                    setError('Invalid email address');
+                    break;
+                case 'auth/weak-password':
+                    setError('Password is too weak');
+                    break;
+                default:
+                    setError('An error occurred during sign up. Please try again.');
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
-    // This will be called after Spotify linking is done
+    // This will be called after Spotify linking is done, NEED TO DO THIS WHEN CLICKING SIGN IN
     const handleSpotifyLinked = async () => {
         setShowLinkSpotify(false);
         setLoading(true);
