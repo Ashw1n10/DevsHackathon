@@ -196,6 +196,11 @@ def get_songs():
         firebase_response = add_spotify_data_to_firebase(
             top_artists_array=top_artists_array,
             top_genres_array=top_genres_array,
+            valence=average_valence,
+            energy=average_energy,
+            danceability=average_danceability,
+            tempo=average_tempo,
+            instrumentalness=average_instrumentalness,
             user_id=session.get('user_id')  # Use session user ID if available
         )
         

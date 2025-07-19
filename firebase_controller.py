@@ -35,7 +35,7 @@ initialize_firebase()
 # Initialize Firestore client
 db = firestore.client()
 
-def add_spotify_data_to_firebase(top_artists_array, top_genres_array, user_id=None):
+def add_spotify_data_to_firebase(top_artists_array, top_genres_array, valence, energy, danceability, tempo, instrumentalness, user_id=None):
     """
     Add top artists and genres arrays to Firestore separately
     
@@ -48,9 +48,6 @@ def add_spotify_data_to_firebase(top_artists_array, top_genres_array, user_id=No
         dict: Success status and any error messages
     """
     try:
-        # Generate timestamp for this entry
-        timestamp = datetime.datetime.now()
-        
         # Create user ID if not provided
         if user_id is None:
             user_id = f"user_{int(datetime.datetime.now().timestamp())}"
@@ -60,9 +57,13 @@ def add_spotify_data_to_firebase(top_artists_array, top_genres_array, user_id=No
         
         # Create the data structure for Firestore
         user_data = {
-            'timestamp': timestamp,
             'top_artists': top_artists_array,
-            'top_genres': top_genres_array
+            'top_genres': top_genres_array, 
+            'valence' : valence, 
+            'energy' : energy, 
+            'danceability' : danceability, 
+            'tempo' : tempo, 
+            'instrumentalness' : instrumentalness
         }
         
         # Add data to Firestore
@@ -75,7 +76,6 @@ def add_spotify_data_to_firebase(top_artists_array, top_genres_array, user_id=No
         return {
             'success': True,
             'user_id': user_id,
-            'timestamp': timestamp.isoformat(),
             'message': 'Data successfully added to Firestore'
         }
         
