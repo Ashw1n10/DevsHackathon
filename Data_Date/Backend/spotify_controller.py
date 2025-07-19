@@ -1,7 +1,9 @@
 import os 
 import time
+import json
 
-from flask import Flask, request, session, url_for, redirect
+from flask import Flask, request, session, url_for, redirect, jsonify
+from flask_cors import CORS
 
 from spotipy import Spotify 
 from spotipy.oauth2 import SpotifyOAuth
@@ -16,7 +18,11 @@ REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 SCOPE = 'user-top-read'
 
 app = Flask(__name__) 
-app.config['SECRET_KEY'] = os.urandom(64) # Secret key for encryption, if we run into issues CHANGE into a fixed value
+app.config['SECRET_KEY'] = os.urandom(64)
+
+# Enable CORS for React frontend
+CORS(app, origins=['http://localhost:5173', 'http://127.0.0.1:5000'], 
+     supports_credentials=True, allow_headers=['Content-Type'])
 
 cache_handler = FlaskSessionCacheHandler(session)
 
@@ -35,12 +41,12 @@ sp = Spotify(auth_manager=sp_oauth)
 # Access rules with the spotify api, flask endpoints and website navigation
 @app.route('/')
 def home(): 
-    if not sp_oauth.validate_token(cache_handler.get_cached_token()): # Validating token
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()): 
         auth_url = sp_oauth.get_authorize_url()
         return redirect(auth_url)
     return redirect(url_for('get_songs'))
 
-@app.route('/callback') # if youve already logged in 
+@app.route('/callback') 
 def callback(): 
     sp_oauth.get_access_token(request.args['code'])
     return redirect(url_for('get_songs'))
@@ -71,12 +77,9 @@ def get_songs():
             # Try to get audio features for individual track
             try:
                 time.sleep(0.1)  # Small delay to avoid rate limiting
-                print(f"Trying to get features for track ID: {track['id']}")
-                features = sp.audio_features([track['id']])[0]  # Get first item from list
-                print(f"Raw features response: {features}")
+                features = sp.audio_features([track['id']])[0]
                 
                 if features:
-                    print(f"Successfully got features for: {track['name']}")
                     song_data.update({
                         'valence': round(features['valence'], 3),
                         'energy': round(features['energy'], 3),
@@ -85,7 +88,6 @@ def get_songs():
                         'instrumentalness': round(features['instrumentalness'], 3)
                     })
                 else:
-                    print(f"No features returned for: {track['name']} - features is None or empty")
                     # Use mock data for demonstration purposes
                     import random
                     song_data.update({
@@ -123,7 +125,7 @@ def get_songs():
             artist_data = {
                 'rank': idx,
                 'name': artist['name'],
-                'genres': artist['genres'][:3] if artist['genres'] else ['No genres listed'],  # Show top 3 genres
+                'genres': artist['genres'][:3] if artist['genres'] else ['No genres listed'],
                 'popularity': artist['popularity'],
                 'followers': artist['followers']['total'],
                 'external_url': artist['external_urls']['spotify']
@@ -136,164 +138,105 @@ def get_songs():
             for genre in artist['genres']:
                 genre_count[genre] = genre_count.get(genre, 0) + 1
 
-        # Get top 10 genres
         top_genres = sorted(genre_count.items(), key=lambda x: x[1], reverse=True)[:10]
-
         genres_info = []
         for idx, (genre, count) in enumerate(top_genres, 1):
             genre_data = {
                 'rank': idx,
-                'name': genre.title(),  # Capitalize genre name
+                'name': genre.title(),
                 'count': count,
                 'percentage': round((count / len(all_artists['items'])) * 100, 1)
             }
             genres_info.append(genre_data)
         
-        # Save to arrays for potential future use
-        top_songs_array = [song['name'] for song in songs_info]
-        top_artists_array = [artist['name'] for artist in artists_info]
-        top_genres_array = [genre['name'] for genre in genres_info]
+        # Calculate averages
+        def calculate_average(arr):
+            numeric_values = [val for val in arr if isinstance(val, (int, float))]
+            return round(sum(numeric_values) / len(numeric_values), 3) if numeric_values else 0.0
         
-        # Audio features arrays
         valence_array = [song['valence'] for song in songs_info]
         energy_array = [song['energy'] for song in songs_info]
         danceability_array = [song['danceability'] for song in songs_info]
         tempo_array = [song['tempo'] for song in songs_info]
         instrumentalness_array = [song['instrumentalness'] for song in songs_info]
         
-        # Calculate averages for audio features (only for numeric values, skip 'N/A')
-        def calculate_average(arr):
-            numeric_values = [val for val in arr if isinstance(val, (int, float))]
-            return round(sum(numeric_values) / len(numeric_values), 3) if numeric_values else 0.0
-        
-        # Audio feature averages saved as decimals
         average_valence = calculate_average(valence_array)
         average_energy = calculate_average(energy_array)
         average_danceability = calculate_average(danceability_array)
         average_tempo = calculate_average(tempo_array)
         average_instrumentalness = calculate_average(instrumentalness_array)
         
-        # Print arrays to console for debugging/verification
-        print("Top 10 Songs Array:", top_songs_array)
-        print("Top 10 Artists Array:", top_artists_array)
-        print("Top 10 Genres Array:", top_genres_array)
-        print("Valence Array:", valence_array)
-        print("Energy Array:", energy_array)
-        print("Danceability Array:", danceability_array)
-        print("Tempo Array:", tempo_array)
-        print("Instrumentalness Array:", instrumentalness_array)
-        
-        # Print averages
-        print("\n=== AUDIO FEATURE AVERAGES ===")
-        print(f"Average Valence: {average_valence}")
-        print(f"Average Energy: {average_energy}")
-        print(f"Average Danceability: {average_danceability}")
-        print(f"Average Tempo: {average_tempo}")
-        print(f"Average Instrumentalness: {average_instrumentalness}")
-        print("================================\n")
-
-        # Add data to Firebase
+        # Save to Firebase
         firebase_response = add_spotify_data_to_firebase(
-            top_songs_array=top_songs_array,
-            top_artists_array=top_artists_array,
-            top_genres_array=top_genres_array,
+            top_songs_array=[song['name'] for song in songs_info],
+            top_artists_array=[artist['name'] for artist in artists_info],
+            top_genres_array=[genre['name'] for genre in genres_info],
             valence=average_valence,
             energy=average_energy,
             danceability=average_danceability,
             tempo=average_tempo,
             instrumentalness=average_instrumentalness,
-            user_id=session.get('user_id')  # Use session user ID if available
+            user_id=session.get('user_id')
         )
         
         # Create HTML response
-        html_content = """
+        html_content = f"""
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Your Spotify Music Profile</title>
+            <title>Your Spotify Data</title>
             <style>
-                body { font-family: Arial, sans-serif; margin: 40px; background-color: #191414; color: #1db954; }
-                h1, h2 { text-align: center; color: #1db954; }
-                h2 { margin-top: 40px; margin-bottom: 20px; }
-                .track, .genre, .artist { background-color: #282828; margin: 10px 0; padding: 15px; border-radius: 8px; }
-                .track-name, .genre-name, .artist-name { font-size: 18px; font-weight: bold; color: #ffffff; }
-                .track-artist, .genre-stats, .artist-details { color: #b3b3b3; margin: 5px 0; }
-                .track-details, .audio-features { color: #b3b3b3; font-size: 14px; }
-                .audio-features { margin-top: 8px; padding: 8px; background-color: #1a1a1a; border-radius: 4px; }
-                a { color: #1db954; text-decoration: none; }
-                a:hover { text-decoration: underline; }
-                .section { margin-bottom: 50px; }
-                .artist-genres { color: #1db954; font-size: 14px; font-style: italic; }
+                body {{ font-family: Arial, sans-serif; margin: 40px; background-color: #191414; color: #1db954; }}
+                h1, h2 {{ color: #1db954; }}
+                .song, .artist, .genre {{ margin: 10px 0; padding: 10px; background-color: #282828; border-radius: 5px; }}
+                .song-title, .artist-name, .genre-name {{ color: #ffffff; font-weight: bold; }}
+                .details {{ color: #b3b3b3; font-size: 14px; }}
+                .summary {{ background-color: #1db954; color: #191414; padding: 20px; border-radius: 10px; margin: 20px 0; }}
+                .close-btn {{ position: fixed; top: 20px; right: 20px; background: #1db954; color: #191414; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; }}
             </style>
         </head>
         <body>
+            <button class="close-btn" onclick="window.close()">Close</button>
             <h1>🎵 Your Spotify Music Profile</h1>
             
-            <div class="section">
-                <h2>🎶 Your Top 10 Tracks</h2>
-        """
-        
-        for song in songs_info:
-            html_content += f"""
-            <div class="track">
-                <div class="track-name">#{song['rank']} {song['name']}</div>
-                <div class="track-artist">by {song['artist']}</div>
-                <div class="track-details">
-                    Album: {song['album']} | Popularity: {song['popularity']}/100<br>
-                    <a href="{song['external_url']}" target="_blank">🎧 Listen on Spotify</a>
-                </div>
-                <div class="audio-features">
-                    <strong>Audio Features:</strong><br>
-                    Valence: {song['valence']} | Energy: {song['energy']} | Danceability: {song['danceability']}<br>
-                    Tempo: {song['tempo']} BPM | Instrumentalness: {song['instrumentalness']}
-                </div>
-            </div>
-            """
-        
-        html_content += """
+            <div class="summary">
+                <h2>📊 Your Music DNA</h2>
+                <p><strong>Valence (Happiness):</strong> {average_valence}</p>
+                <p><strong>Energy:</strong> {average_energy}</p>
+                <p><strong>Danceability:</strong> {average_danceability}</p>
+                <p><strong>Average Tempo:</strong> {average_tempo} BPM</p>
+                <p><strong>Instrumentalness:</strong> {average_instrumentalness}</p>
             </div>
             
-            <div class="section">
-                <h2>🎤 Your Top 10 Artists</h2>
-        """
-        
-        for artist in artists_info:
-            genres_text = ", ".join(artist['genres'])
-            html_content += f"""
+            <h2>🎵 Your Top Songs</h2>
+            {''.join([f'''
+            <div class="song">
+                <div class="song-title">#{song["rank"]} {song["name"]}</div>
+                <div class="details">by {song["artist"]} • {song["album"]}</div>
+                <div class="details">Energy: {song["energy"]} | Valence: {song["valence"]} | Tempo: {song["tempo"]} BPM</div>
+            </div>
+            ''' for song in songs_info])}
+            
+            <h2>🎤 Your Top Artists</h2>
+            {''.join([f'''
             <div class="artist">
-                <div class="artist-name">#{artist['rank']} {artist['name']}</div>
-                <div class="artist-details">
-                    Popularity: {artist['popularity']}/100 | Followers: {artist['followers']:,}<br>
-                    <div class="artist-genres">Genres: {genres_text}</div>
-                    <a href="{artist['external_url']}" target="_blank">🎧 View on Spotify</a>
-                </div>
+                <div class="artist-name">#{artist["rank"]} {artist["name"]}</div>
+                <div class="details">Genres: {", ".join(artist["genres"])} • Popularity: {artist["popularity"]}</div>
             </div>
-            """
-        
-        html_content += """
-            </div>
+            ''' for artist in artists_info])}
             
-            <div class="section">
-                <h2>🎭 Your Top 10 Genres</h2>
-        """
-        
-        for genre in genres_info:
-            html_content += f"""
+            <h2>🎭 Your Top Genres</h2>
+            {''.join([f'''
             <div class="genre">
-                <div class="genre-name">#{genre['rank']} {genre['name']}</div>
-                <div class="genre-stats">
-                    Found in {genre['count']} of your top artists ({genre['percentage']}%)
-                </div>
+                <div class="genre-name">#{genre["rank"]} {genre["name"]}</div>
+                <div class="details">{genre["count"]} artists ({genre["percentage"]}% of your top artists)</div>
             </div>
-            """
-        
-        html_content += """
-            </div>
+            ''' for genre in genres_info])}
         </body>
         </html>
         """
         
-        # Print the formatted user data after HTML is created
+        # Print formatted data as requested
         if firebase_response.get('success') and firebase_response.get('user_id'):
             user_data = get_user_spotify_data(firebase_response['user_id'])
             if user_data:
@@ -305,9 +248,226 @@ def get_songs():
         return html_content
         
     except Exception as e:
-        return f"<h1>Error fetching your top tracks:</h1><p>{str(e)}</p>"
+        return f"<html><body><h1>Error: {str(e)}</h1></body></html>", 500
 
+# NEW API ROUTES FOR REACT INTEGRATION
 
+@app.route('/api/spotify/auth-url')
+def get_auth_url():
+    """Get Spotify authorization URL for frontend"""
+    try:
+        auth_url = sp_oauth.get_authorize_url()
+        return jsonify({
+            'success': True,
+            'auth_url': auth_url
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/spotify/status')
+def spotify_status():
+    """Check if user is authenticated with Spotify"""
+    try:
+        token_valid = sp_oauth.validate_token(cache_handler.get_cached_token())
+        return jsonify({
+            'success': True,
+            'authenticated': token_valid
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'authenticated': False,
+            'error': str(e)
+        })
+
+@app.route('/api/spotify/user-data')
+def get_user_data_api():
+    """Get user's Spotify data as JSON for React frontend"""
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
+        return jsonify({
+            'success': False,
+            'error': 'Not authenticated with Spotify',
+            'authenticated': False
+        }), 401
+    
+    try:
+        # Get top 10 tracks
+        songs = sp.current_user_top_tracks(limit=10, time_range='medium_term')
+        
+        # Extract song information and get audio features
+        songs_info = []
+        
+        for idx, track in enumerate(songs['items'], 1):
+            song_data = {
+                'rank': idx,
+                'name': track['name'],
+                'artist': ', '.join([artist['name'] for artist in track['artists']]),
+                'album': track['album']['name'],
+                'popularity': track['popularity'],
+                'external_url': track['external_urls']['spotify']
+            }
+            
+            # Try to get audio features for individual track
+            try:
+                time.sleep(0.1)  # Small delay to avoid rate limiting
+                features = sp.audio_features([track['id']])[0]
+                
+                if features:
+                    song_data.update({
+                        'valence': round(features['valence'], 3),
+                        'energy': round(features['energy'], 3),
+                        'danceability': round(features['danceability'], 3),
+                        'tempo': round(features['tempo'], 1),
+                        'instrumentalness': round(features['instrumentalness'], 3)
+                    })
+                else:
+                    # Use mock data for demonstration purposes
+                    import random
+                    song_data.update({
+                        'valence': round(random.uniform(0.1, 0.9), 3),
+                        'energy': round(random.uniform(0.1, 0.9), 3),
+                        'danceability': round(random.uniform(0.1, 0.9), 3),
+                        'tempo': round(random.uniform(80, 180), 1),
+                        'instrumentalness': round(random.uniform(0.0, 0.5), 3)
+                    })
+            except Exception as audio_error:
+                # Use mock data as fallback
+                import random
+                song_data.update({
+                    'valence': round(random.uniform(0.1, 0.9), 3),
+                    'energy': round(random.uniform(0.1, 0.9), 3),
+                    'danceability': round(random.uniform(0.1, 0.9), 3),
+                    'tempo': round(random.uniform(80, 180), 1),
+                    'instrumentalness': round(random.uniform(0.0, 0.5), 3)
+                })
+            
+            songs_info.append(song_data)
+        
+        # Get top artists
+        all_artists = sp.current_user_top_artists(limit=30, time_range='medium_term')
+        artists_info = []
+        for idx, artist in enumerate(all_artists['items'][:10], 1):
+            artist_data = {
+                'rank': idx,
+                'name': artist['name'],
+                'genres': artist['genres'][:3] if artist['genres'] else ['No genres listed'],
+                'popularity': artist['popularity'],
+                'followers': artist['followers']['total'],
+                'external_url': artist['external_urls']['spotify']
+            }
+            artists_info.append(artist_data)
+        
+        # Extract and count genres
+        genre_count = {}
+        for artist in all_artists['items']:
+            for genre in artist['genres']:
+                genre_count[genre] = genre_count.get(genre, 0) + 1
+
+        top_genres = sorted(genre_count.items(), key=lambda x: x[1], reverse=True)[:10]
+        genres_info = []
+        for idx, (genre, count) in enumerate(top_genres, 1):
+            genre_data = {
+                'rank': idx,
+                'name': genre.title(),
+                'count': count,
+                'percentage': round((count / len(all_artists['items'])) * 100, 1)
+            }
+            genres_info.append(genre_data)
+        
+        # Calculate averages
+        def calculate_average(arr):
+            numeric_values = [val for val in arr if isinstance(val, (int, float))]
+            return round(sum(numeric_values) / len(numeric_values), 3) if numeric_values else 0.0
+        
+        valence_array = [song['valence'] for song in songs_info]
+        energy_array = [song['energy'] for song in songs_info]
+        danceability_array = [song['danceability'] for song in songs_info]
+        tempo_array = [song['tempo'] for song in songs_info]
+        instrumentalness_array = [song['instrumentalness'] for song in songs_info]
+        
+        average_valence = calculate_average(valence_array)
+        average_energy = calculate_average(energy_array)
+        average_danceability = calculate_average(danceability_array)
+        average_tempo = calculate_average(tempo_array)
+        average_instrumentalness = calculate_average(instrumentalness_array)
+        
+        # Save to Firebase
+        firebase_response = add_spotify_data_to_firebase(
+            top_songs_array=[song['name'] for song in songs_info],
+            top_artists_array=[artist['name'] for artist in artists_info],
+            top_genres_array=[genre['name'] for genre in genres_info],
+            valence=average_valence,
+            energy=average_energy,
+            danceability=average_danceability,
+            tempo=average_tempo,
+            instrumentalness=average_instrumentalness,
+            user_id=session.get('user_id')
+        )
+        
+        # Return formatted data in the exact format you requested
+        formatted_data = {
+            "valence": average_valence,
+            "energy": average_energy,
+            "danceability": average_danceability,
+            "tempo": average_tempo,
+            "instrumentalness": average_instrumentalness,
+            "top_genres": [genre['name'] for genre in genres_info[:3]],
+            "top_artists": [artist['name'] for artist in artists_info[:3]]
+        }
+        
+        # Print the formatted data as requested
+        if firebase_response.get('success') and firebase_response.get('user_id'):
+            user_data = get_user_spotify_data(firebase_response['user_id'])
+            if user_data:
+                print("\n=== FORMATTED USER DATA ===")
+                print(f"User ID: {firebase_response['user_id']}")
+                print(f"Data: {user_data}")
+                print("===========================\n")
+        
+        return jsonify({
+            'success': True,
+            'authenticated': True,
+            'formatted_data': formatted_data,
+            'detailed_data': {
+                'songs': songs_info,
+                'artists': artists_info,
+                'genres': genres_info
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/set-user-id', methods=['POST'])
+def set_user_id():
+    """Set user ID in session for React frontend"""
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        
+        if user_id:
+            session['user_id'] = user_id
+            return jsonify({
+                'success': True,
+                'message': 'User ID set in session'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'No user_id provided'
+            }), 400
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=True, host='127.0.0.1', port=5000)

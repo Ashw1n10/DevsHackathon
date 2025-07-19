@@ -9,7 +9,7 @@ import json
 def initialize_firebase():
     if not firebase_admin._apps:
         # Option 1: Use service account key file (for local development)
-        service_account_path = '/Users/andy/Documents/Data_Date/Data_Date/Backend/serviceAccountKey.json'
+        service_account_path = 'serviceAccountKey.json'
         
         # Option 2: Use environment variable (for production)
         service_account_env = os.getenv('FIREBASE_SERVICE_ACCOUNT_KEY')
