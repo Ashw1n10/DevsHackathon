@@ -6,6 +6,9 @@ from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.cache_handler import FlaskSessionCacheHandler
 
+# Import Firebase function
+from firebase_controller import add_spotify_data_to_firebase
+
 # === Replace with your Spotify app credentials ===
 CLIENT_ID = '01b47c0963834b1f9869b3cc8fb122a7'
 CLIENT_SECRET = 'b1c0561f9c6d4430852242ba917f216c'
@@ -92,27 +95,44 @@ def get_songs():
         print("Top 5 Artists Array:", top_artists_array)
         print("Top 5 Genres Array:", top_genres_array)
         
+        # Add data to Firebase
+        firebase_result = add_spotify_data_to_firebase(top_artists_array, top_genres_array)
+        
+        # Check if Firebase operation was successful
+        if firebase_result['success']:
+            print(f"🔥 Firebase Success: {firebase_result['message']}")
+        else:
+            print(f"🔥 Firebase Error: {firebase_result['message']}")
+        
         # Create HTML response
-        html_content = """
+        html_content = f"""
         <!DOCTYPE html>
         <html>
         <head>
             <title>Your Spotify Music Profile</title>
             <style>
-                body { font-family: Arial, sans-serif; margin: 40px; background-color: #191414; color: #1db954; }
-                h1, h2 { text-align: center; color: #1db954; }
-                h2 { margin-top: 40px; margin-bottom: 20px; }
-                .genre, .artist { background-color: #282828; margin: 10px 0; padding: 15px; border-radius: 8px; }
-                .genre-name, .artist-name { font-size: 18px; font-weight: bold; color: #ffffff; }
-                .genre-stats, .artist-details { color: #b3b3b3; margin: 5px 0; }
-                a { color: #1db954; text-decoration: none; }
-                a:hover { text-decoration: underline; }
-                .section { margin-bottom: 50px; }
-                .artist-genres { color: #1db954; font-size: 14px; font-style: italic; }
+                body {{ font-family: Arial, sans-serif; margin: 40px; background-color: #191414; color: #1db954; }}
+                h1, h2 {{ text-align: center; color: #1db954; }}
+                h2 {{ margin-top: 40px; margin-bottom: 20px; }}
+                .genre, .artist {{ background-color: #282828; margin: 10px 0; padding: 15px; border-radius: 8px; }}
+                .genre-name, .artist-name {{ font-size: 18px; font-weight: bold; color: #ffffff; }}
+                .genre-stats, .artist-details {{ color: #b3b3b3; margin: 5px 0; }}
+                a {{ color: #1db954; text-decoration: none; }}
+                a:hover {{ text-decoration: underline; }}
+                .section {{ margin-bottom: 50px; }}
+                .artist-genres {{ color: #1db954; font-size: 14px; font-style: italic; }}
+                .firebase-status {{ background-color: #{"#1e3a1e" if firebase_result['success'] else "#3a1e1e"}; padding: 10px; margin: 20px 0; border-radius: 5px; text-align: center; }}
+                .firebase-status.success {{ color: #4caf50; }}
+                .firebase-status.error {{ color: #f44336; }}
             </style>
         </head>
         <body>
             <h1>🎵 Your Spotify Music Profile</h1>
+            
+            <div class="firebase-status {'success' if firebase_result['success'] else 'error'}">
+                🔥 Firebase: {firebase_result['message']}
+                {f"<br>User ID: {firebase_result.get('user_id', 'N/A')}" if firebase_result['success'] else ""}
+            </div>
             
             <div class="section">
                 <h2>🎤 Your Top 5 Artists</h2>
