@@ -9,7 +9,7 @@ import json
 def initialize_firebase():
     if not firebase_admin._apps:
         # Option 1: Use service account key file (for local development)
-        service_account_path = 'serviceAccountKey.json'
+        service_account_path = '/Users/andy/Documents/Data_Date/Data_Date/Backend/serviceAccountKey.json'
         
         # Option 2: Use environment variable (for production)
         service_account_env = os.getenv('FIREBASE_SERVICE_ACCOUNT_KEY')
@@ -188,5 +188,16 @@ def update_user_field(user_id, field_name, field_value):
             'error': str(e),
             'message': error_msg
         }
+    
 
+def update_user_match(user_id, partner_id, score):
+    """
+    Write a single match for user_id:
+      matches/{user_id} → { partner: partner_id, score: score }
+    """
+    doc_ref = db.collection('matches_collection').document(user_id)
+    doc_ref.set({
+        'partner': partner_id,
+        'score': score
+    })
 
