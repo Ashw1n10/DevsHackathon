@@ -1,29 +1,25 @@
 // import { useState } from 'react'
-import './styles/MatchesPage.css'
+import styles from './styles/MatchesPage.module.css';
 import Logo from './assets/Logo.png'
+import PersonIcon from '@mui/icons-material/Person';
 
 function MatchesPage() {
 
   return (
     <>
-      <div className="nav">
-        <div className='leftNav'>
+      <div className={styles.nav}>
+        <div className={styles.leftNav}>
           <div>
-            <img src={Logo} alt="Logo" className="logo" />
+            <img src={Logo} alt="Logo" className={styles.logo} />
           </div>
-          <a href="" className="about">About</a>
+          {/* <a href="" className={styles.about}>About</a> */}
         </div>
-        <button className="login">Login</button>
+        <button className={styles.login}>
+            <PersonIcon className={styles.icon} /> 
+        </button>
+        
       </div>
-      <div className="hero">
-        <div className="header">
-          <h1>Find your perfect match through <span className='gradient'>music</span>.</h1>
-          <div className="getStarted">
-            <button><span class="buttonText">Get Started</span></button>
-          </div>
-        </div>
 
-      </div>
     </>
   )
 }
