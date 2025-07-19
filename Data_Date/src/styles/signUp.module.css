@@ -38,7 +38,7 @@
     justify-content: center ;
 }
 
-input, select, button {
+input, select, .linkSpotifyButton, .signUpButton {
     width: 90%;
     box-sizing: border-box;
     padding: 10px;
@@ -48,7 +48,7 @@ input, select, button {
     border: 1px solid #ccc;
 }
 
-button {
+.linkSpotifyButton, .signUpButton {
   padding: 12px 28px;
   border-radius: 10px;
   border: 0;
