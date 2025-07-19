@@ -2,13 +2,35 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 import datetime
+import os
+import json
 
-# Fetch the service account key JSON file contents
-# Replace 'path/to/serviceAccountKey.json' with your actual service account key path
-cred = credentials.Certificate("D:\Personal Projects\Hackathons\DEVS_2025\DevsHackathon\serviceAccountKey.json")
+# Initialize Firebase using service account key file or environment variable
+def initialize_firebase():
+    if not firebase_admin._apps:
+        # Option 1: Use service account key file (for local development)
+        service_account_path = 'serviceAccountKey.json'
+        
+        # Option 2: Use environment variable (for production)
+        service_account_env = os.getenv('FIREBASE_SERVICE_ACCOUNT_KEY')
+        
+        if os.path.exists(service_account_path):
+            # Use local file
+            cred = credentials.Certificate(service_account_path)
+            print("🔥 Using local service account key file")
+        elif service_account_env:
+            # Use environment variable
+            service_account_info = json.loads(service_account_env)
+            cred = credentials.Certificate(service_account_info)
+            print("🔥 Using service account key from environment variable")
+        else:
+            raise Exception("No Firebase service account key found. Please add serviceAccountKey.json or set FIREBASE_SERVICE_ACCOUNT_KEY environment variable.")
+        
+        # Initialize the app
+        firebase_admin.initialize_app(cred)
 
-# Initialize the app with a service account, granting admin privileges
-firebase_admin.initialize_app(cred)
+# Initialize Firebase
+initialize_firebase()
 
 # Initialize Firestore client
 db = firestore.client()
@@ -66,7 +88,7 @@ def add_spotify_data_to_firebase(top_artists_array, top_genres_array, user_id=No
             'message': error_msg
         }
 
-def get_user_spotify_data(user_id):
+def get_user_spotify_data(user_id): 
     """
     Retrieve user's Spotify data from Firestore
     
