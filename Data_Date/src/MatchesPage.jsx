@@ -10,7 +10,7 @@ import MatchProfilePopup from './MatchProfilePopup.jsx'
 function MatchesPage() {
   const [spun, setSpun] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [spinsLeft, setSpinsLeft] = useState(5);
+  const [spinsLeft, setSpinsLeft] = useState(50);
   const [lastSpinDate, setLastSpinDate] = useState('');
   const [timeUntilNextDay, setTimeUntilNextDay] = useState('');
   const [showPopup, setShowPopup] = useState(false);
@@ -21,12 +21,12 @@ function MatchesPage() {
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
-    
+
     const timeDiff = tomorrow - now;
     const hours = Math.floor(timeDiff / (1000 * 60 * 60));
     const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-    
+
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
@@ -36,7 +36,7 @@ function MatchesPage() {
       const timer = setInterval(() => {
         setTimeUntilNextDay(calculateTimeUntilNextDay());
       }, 1000);
-      
+
       return () => clearInterval(timer);
     }
   }, [spinsLeft]);
@@ -51,7 +51,7 @@ function MatchesPage() {
       // New day, reset spins
       setSpinsLeft(5);
       setLastSpinDate(today);
-      localStorage.setItem('spinsLeft', '5');
+      localStorage.setItem('spinsLeft', '50');
       localStorage.setItem('lastSpinDate', today);
     } else if (savedSpins) {
       // Same day, load saved spins
@@ -72,18 +72,18 @@ function MatchesPage() {
       const newSpinsLeft = spinsLeft - 1;
       setSpinsLeft(newSpinsLeft);
       localStorage.setItem('spinsLeft', newSpinsLeft.toString());
-      
+
       setTimeout(() => {
         setIsSpinning(false);
-        setShowPopup(true);
         setSpun(true);
+        setShowPopup(true);
       }, 5000);
     }
   };
 
   return (
     <>
-    <div className={styles.background}></div>
+      <div className={styles.background}></div>
       <div className={styles.nav}>
         <div className={styles.leftNav}>
           <div>
@@ -92,27 +92,29 @@ function MatchesPage() {
           {/* <a href="" className={styles.about}>About</a> */}
         </div>
         <button className={styles.login}>
-            <PersonIcon className={styles.icon} /> 
+          <PersonIcon className={styles.icon} />
         </button>
       </div>
 
-      <div className={styles.disc}>
-          <img 
-            src={Disc} 
-            alt="Disc" 
-            onClick={handleDiscClick}
-            style={{
-              cursor: 'pointer',
-              transition: isSpinning
-                ? 'transform 5s cubic-bezier(0.68, -0.55, 0.265, 1.55)'
-                : 'transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-              transform:
-                (isSpinning
-                  ? 'rotate(1080deg) '
-                  : 'rotate(0deg) ') +
-                (showPopup ? 'translateY(0)' : 'translateY(0)')
-            }}
-          />
+      <div
+        className={styles.disc}
+        style={{
+          transform: `translate(-50%, -50%)${showPopup ? ' translateY(-80%)' : ''}`,
+          transition: 'transform 0.75s cubic-bezier(0.68, -0.55, 0.265, 1.55)'
+        }}
+      >
+        <img
+          src={Disc}
+          alt="Disc"
+          onClick={handleDiscClick}
+          style={{
+            cursor: 'pointer',
+            transition: isSpinning
+              ? 'transform 5s cubic-bezier(0.68, -0.55, 0.265, 1.55)'
+              : 'none',
+            transform: `rotate(${isSpinning ? 1080 : 0}deg)`
+          }}
+        />
       </div>
 
       <div className={styles.lock}>
@@ -121,15 +123,22 @@ function MatchesPage() {
         )}
         {spinsLeft === 0 && (
           <div>
-            <p>Come back in:            <span className={styles.countdown}>{timeUntilNextDay}</span>
+            <p>Come back in: <span className={styles.countdown}>{timeUntilNextDay}</span>
             </p>
           </div>
         )}
       </div>
 
       {showPopup && (
-        <MatchProfilePopup onClose={() => setShowPopup(false)} />
+        <MatchProfilePopup
+          onClose={() => {
+            setTimeout(() => {
+              setShowPopup(false);
+            }, 500);
+          }}
+        />
       )}
+
 
     </>
   )
