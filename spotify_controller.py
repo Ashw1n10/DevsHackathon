@@ -68,7 +68,7 @@ def get_songs():
             
             # Try to get audio features for individual track
             try:
-                #time.sleep(0.1)  # Small delay to avoid rate limiting
+                time.sleep(0.1)  # Small delay to avoid rate limiting
                 print(f"Trying to get features for track ID: {track['id']}")
                 features = sp.audio_features([track['id']])[0]  # Get first item from list
                 print(f"Raw features response: {features}")
@@ -113,7 +113,7 @@ def get_songs():
             songs_info.append(song_data)
         
         # Get top artists
-        all_artists = sp.current_user_top_artists(limit=20, time_range='medium_term')
+        all_artists = sp.current_user_top_artists(limit=30, time_range='medium_term')
         
         # Extract top 10 artists information
         artists_info = []
