@@ -1,9 +1,15 @@
 import styleSignUp from './styles/signUp.module.css';
 import Logo from './assets/Logo.png';
 
-function SignUp() {
+function SignUp({ onClose }) {
+    // Close modal when clicking outside modalContent
+    const handleOutsideClick = (e) => {
+        if (e.target === e.currentTarget) {
+            onClose();
+        }
+    };
     return (
-        <div className={styleSignUp.modal}>
+        <div className={styleSignUp.modal} onClick={handleOutsideClick}>
             <div className={styleSignUp.modalContent}>
                 <img src={Logo} alt="Logo" className={styleSignUp.logo} />
                 <div className={styleSignUp.scrollableContent}>
