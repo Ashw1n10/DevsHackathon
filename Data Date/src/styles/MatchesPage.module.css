@@ -13,8 +13,8 @@ body {
     height: 100vh;
     width: 100vw;
     transform: translate(-50%,-50%);
-    background: linear-gradient(45deg, #ff006e 0%, #8338ec 25%, #3a86ff 50%, #06ffa5 75%, #ffbe0b 100%);
-    /* background: linear-gradient(to bottom, #000 0%, #0d280571 100%); */
+    /* background: linear-gradient(45deg, #ff006e 0%, #8338ec 25%, #3a86ff 50%, #06ffa5 75%, #ffbe0b 100%); */
+    background: linear-gradient(to bottom, #000 0%, #0d280571 100%);
   }
 
   

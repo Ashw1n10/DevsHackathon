@@ -3,6 +3,7 @@ import styles from './styles/MatchesPage.module.css';
 import Logo from './assets/Logo.png'
 import PersonIcon from '@mui/icons-material/Person';
 import Disc from './assets/MusicDisc.png'
+import MatchPopup from './MatchProfilePopup.jsx'
 
 
 
@@ -110,9 +111,14 @@ function MatchesPage() {
           <p>You have {spinsLeft} Spins left</p>
         )}
         {spinsLeft === 0 && (
-          <p>Come back in: {timeUntilNextDay}</p>
+          <div>
+            <p>Come back in:</p>
+            <p className={styles.countdown}>{timeUntilNextDay}</p>
+          </div>
         )}
       </div>
+
+      <MatchPopup />
 
     </>
   )
