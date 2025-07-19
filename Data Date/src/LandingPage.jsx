@@ -2,6 +2,7 @@
 import styles from './styles/LandingPage.module.css'
 import Logo from './assets/Logo.png'
 
+
 function App() {
 
   return (

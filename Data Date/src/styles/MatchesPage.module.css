@@ -67,3 +67,32 @@ div.hero {
   height: 100vh;
   background: linear-gradient(to bottom, #000 0%, #0d280571 100%);
 }
+
+.disc {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+}
+
+.disc img {
+  height: 90vh;
+  width: auto;
+  filter: drop-shadow(2px 2px 12px #c5c5c5d3) drop-shadow(-2px -2px 10px #ffffffd0);
+  animation: disc-pulse 2s ease-in-out infinite alternate;
+  cursor: pointer;
+}
+
+@keyframes disc-pulse {
+  0% {
+    filter: drop-shadow(2px 2px 12px #c5c5c5d3) drop-shadow(-2px -2px 10px #ffffffd0);
+  }
+
+  100% {
+    filter: drop-shadow(2px 2px 12px #c5c5c500) drop-shadow(-2px -2px 10px #ffffff00);
+  }
+}
