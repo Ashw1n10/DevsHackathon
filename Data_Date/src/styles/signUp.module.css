@@ -14,7 +14,7 @@
     max-height: 80vh;
     width: 90%;
     max-width: 400px;
-    background: black;
+    background: rgb(255, 255, 255);
     padding: 20px;
     border-radius: 8px;
     overflow: hidden;
@@ -22,6 +22,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center ;
+    border-radius: 25px;
 }
 
 .scrollableContent {
@@ -29,6 +30,17 @@
     max-height: 70vh;
     width: 100%;
 }
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.scrollableContent::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .scrollableContent {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
 
 .SignUpContainer {
     display: flex;
@@ -56,23 +68,51 @@ input, select, .linkSpotifyButton, .signUpButton {
   color: #050100;
   cursor: pointer;
   font-size: 16px;
-  transition: background-color 0.3s, color 0.3s;
+  transition: all 0.3s;
+  border: 1px #05010081 solid;
+}
+
+.linkSpotifyButton {
+    background-color: #16d35ee7;
+    color: #fff;
 }
 
 button:hover {
-  background-color: #16d35ee7;
-  color: #fff;
-  transition: background-color 0.3s, color 0.3s;
+    opacity: 0.8;
+    transition: all 0.3s;
 }
 
 
 label{
     font-size: 14px;
-    color: #fff;
+    color: #050100;
+
+    height: 10px;
+    margin: 0;
     margin-bottom: 5px;
+}
+
+div.labelStyle {
+    width: 90%;
+    text-align: left;
 }
 
 .logo {
     width: 100px;
     margin-bottom: 10px;
+}
+
+form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+
+}
+
+.break {
+    border-top: 1px #0000003a solid;
+    width: 75%;
+    margin: 10px;
 }

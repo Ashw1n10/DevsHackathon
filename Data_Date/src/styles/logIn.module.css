@@ -14,11 +14,11 @@
 .modalContent{
     height: auto;
     max-width: 40vw;
-    width: 100%;
+    /* width: 100%; */
     display: flex;
     flex-direction: column;
     padding: 40px; 
-    background-color: black;
+    background-color: rgb(255, 255, 255);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -38,7 +38,7 @@
 .usernameInput, .passwordInput {
     width: 80%;
     font-size: 16px;
-    padding: 20px 0px 20px 6px;
+    padding: 10px 0px 10px 6px;
     border-radius: 10px;
     border: 1px solid #ccc;
 
@@ -52,6 +52,7 @@ button.logInButton {
   color: #050100;
   cursor: pointer;
   font-size: 16px;
+  border: 1px #05010081 solid;
   transition: background-color 0.3s, color 0.3s;
 }
 
@@ -69,7 +70,7 @@ button.loginButton:hover {
 
 .registerText{
     text-align: center;
-    color: white;
+    color: #050100;
     font-size: 18px;
     text-decoration: none;
 }
@@ -81,8 +82,7 @@ button.loginButton:hover {
     font-weight: bold;
 }
 
-.img.logo {
-
+img.logo {
     width: 60%;
     max-width: 180px;
     height: auto;

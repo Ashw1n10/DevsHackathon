@@ -17,7 +17,7 @@ function SignUp({ onClose }) {
         age: '',
         preference: 'male'
     });
-    
+
     // State for loading and error handling
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -38,22 +38,22 @@ function SignUp({ onClose }) {
             setError('Please fill in all required fields');
             return false;
         }
-        
+
         if (formData.password !== formData.confirmPassword) {
             setError('Passwords do not match');
             return false;
         }
-        
+
         if (formData.password.length < 6) {
             setError('Password must be at least 6 characters long');
             return false;
         }
-        
+
         if (parseInt(formData.age) < 18 || parseInt(formData.age) > 100) {
             setError('Age must be between 18 and 100');
             return false;
         }
-        
+
         return true;
     };
 
@@ -68,23 +68,23 @@ function SignUp({ onClose }) {
     const handleSignUp = async (e) => {
         e.preventDefault();
         setError('');
-        
+
         if (!validateForm()) {
             return;
         }
-        
+
         setLoading(true);
-        
+
         try {
             // Create user with Firebase Auth
             const userCredential = await createUserWithEmailAndPassword(
-                auth, 
-                formData.email, 
+                auth,
+                formData.email,
                 formData.password
             );
-            
+
             const user = userCredential.user;
-            
+
             // Save additional user data to Firestore
             await setDoc(doc(db, 'users', user.uid), {
                 uid: user.uid,
@@ -98,15 +98,15 @@ function SignUp({ onClose }) {
                 createdAt: new Date(),
                 updatedAt: new Date()
             });
-            
+
             console.log('User created successfully:', user.uid);
-            
+
             // Close the modal on successful signup
             onClose();
-            
+
         } catch (error) {
             console.error('Error creating user:', error);
-            
+
             // Handle specific Firebase errors
             switch (error.code) {
                 case 'auth/email-already-in-use':
@@ -140,62 +140,72 @@ function SignUp({ onClose }) {
                 <div className={styleSignUp.scrollableContent}>
                     <div className={styleSignUp.SignUpContainer}>
                         {error && <div className={styleSignUp.error}>{error}</div>}
-                        
+
                         <form onSubmit={handleSignUp}>
-                            <input 
-                                type="text" 
-                                name="username"
-                                placeholder='Enter your Username' 
-                                className={styleSignUp.usernameInput}
-                                value={formData.username}
-                                onChange={handleInputChange}
-                                required
-                            />
-                            
-                            <input 
-                                type="password" 
-                                name="password"
-                                placeholder='Enter your Password' 
-                                className={styleSignUp.passwordInput}
-                                value={formData.password}
-                                onChange={handleInputChange}
-                                required
-                            />
-                            
-                            <input 
-                                type="password" 
-                                name="confirmPassword"
-                                placeholder='Confirm Password' 
-                                className={styleSignUp.confirmPasswordInput}
-                                value={formData.confirmPassword}
-                                onChange={handleInputChange}
-                                required
-                            />
-                            
-                            <input 
-                                type="email" 
-                                name="email"
-                                placeholder='Email' 
-                                className={styleSignUp.emailInput}
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                required
-                            />
-                            
-                            <input 
-                                type="text" 
+
+                            <input
+                                type="text"
                                 name="fullName"
-                                placeholder='Full Name' 
+                                placeholder='Full Name'
                                 className={styleSignUp.nameInput}
                                 value={formData.fullName}
                                 onChange={handleInputChange}
                                 required
                             />
-                            
-                            <label htmlFor="gender" className={styleSignUp.label}>Select your gender</label>
-                            <select 
-                                name="gender" 
-                                id="gender" 
+
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder='Email'
+                                className={styleSignUp.emailInput}
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                required
+                            />
+
+                            <div className={styleSignUp.break}></div>
+
+                            <input
+                                type="text"
+                                name="username"
+                                placeholder='Username'
+                                className={styleSignUp.usernameInput}
+                                value={formData.username}
+                                onChange={handleInputChange}
+                                required
+                            />
+
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder='Password'
+                                className={styleSignUp.passwordInput}
+                                value={formData.password}
+                                onChange={handleInputChange}
+                                required
+                            />
+
+                            <input
+                                type="password"
+                                name="confirmPassword"
+                                placeholder='Confirm Password'
+                                className={styleSignUp.confirmPasswordInput}
+                                value={formData.confirmPassword}
+                                onChange={handleInputChange}
+                                required
+                            />
+
+<div className={styleSignUp.break}></div>
+
+
+
+                            <div className={styleSignUp.labelStyle}>
+                                <label htmlFor="gender" className={styleSignUp.label}>Select your gender</label>
+                            </div>
+
+                            <select
+                                name="gender"
+                                id="gender"
                                 className={styleSignUp.select}
                                 value={formData.gender}
                                 onChange={handleInputChange}
@@ -204,25 +214,31 @@ function SignUp({ onClose }) {
                                 <option value="female">Female</option>
                                 <option value="Non-binary">Non-binary</option>
                             </select>
-                            
-                            <label htmlFor="age" className={styleSignUp.label}>Select your age</label>
-                            <input 
-                                type="number" 
-                                id="age" 
-                                name="age" 
-                                min="18" 
-                                max="100" 
-                                placeholder='Age' 
+
+                            <div className={styleSignUp.labelStyle}>
+                                <label htmlFor="age" >Select your age</label>
+                            </div>
+
+                            <input
+                                type="number"
+                                id="age"
+                                name="age"
+                                min="18"
+                                max="100"
+                                placeholder='Age'
                                 className={styleSignUp.ageInput}
                                 value={formData.age}
                                 onChange={handleInputChange}
                                 required
                             />
-                            
-                            <label htmlFor="preference" className={styleSignUp.label}>Select your preference</label>
-                            <select 
-                                name="preference" 
-                                id="preference" 
+
+                            <div className={styleSignUp.labelStyle}>
+                                <label htmlFor="preference" className={styleSignUp.label}>Select your preference</label>
+                            </div>
+
+                            <select
+                                name="preference"
+                                id="preference"
                                 className={styleSignUp.select}
                                 value={formData.preference}
                                 onChange={handleInputChange}
@@ -232,16 +248,16 @@ function SignUp({ onClose }) {
                                 <option value="Non-binary">Non-binary</option>
                                 <option value="any">Any</option>
                             </select>
-                            
-                            <button 
+
+                            <button
                                 type="button"
                                 className={styleSignUp.linkSpotifyButton}
                                 onClick={handleLinkSpotify}
                             >
                                 {spotifyLinked ? 'Spotify Linked ✓' : 'Link Spotify'}
                             </button>
-                            
-                            <button 
+
+                            <button
                                 type="submit"
                                 className={styleSignUp.signUpButton}
                                 disabled={loading}
