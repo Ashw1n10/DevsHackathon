@@ -1,10 +1,11 @@
 .popupContainer {
     width: 500px;
     height: 75vh;
-    background-color: rgba(255, 255, 255, 0.823);
+    background: linear-gradient(130deg, #cbf2c1 0%, #ffffffa1 100%);
     border-radius: 25px;
     position: fixed;
     top: 50%;
+    border:  rgba(0, 0, 0, 0.315) 2px solid;
     left: 50%;
     font-family: 'Public Sans', sans-serif;
     color: #050100;
@@ -180,6 +181,7 @@ div.break {
     border-radius: 10px;
     padding: 10px 10px;
     font-size: 16px;
+    border: 1px #0000008a solid;
   }
 
   .btns button:hover {
@@ -188,14 +190,14 @@ div.break {
   }
 
   .matchBtn {
-    background-color: #16D360;
+    background: radial-gradient(circle, #29eb73 0%, #16D360 100%);
     display: flex;
     justify-content: center;
     align-items: center;
   }
 
   .rejectBtn {
-    background-color: #ed2222;
+    background: radial-gradient(circle, #e63e3e 0%, #ed2222 100%);
     display: flex;
     justify-content: center;
     align-items: center;
