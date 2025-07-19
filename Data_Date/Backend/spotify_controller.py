@@ -52,7 +52,7 @@ def get_songs():
         return redirect(auth_url)
     
     try:
-        # Get top 5 tracks
+        # Get top 10 tracks
         songs = sp.current_user_top_tracks(limit=10, time_range='medium_term')
         
         # Extract song information and get audio features
@@ -174,9 +174,9 @@ def get_songs():
         average_instrumentalness = calculate_average(instrumentalness_array)
         
         # Print arrays to console for debugging/verification
-        print("Top 5 Songs Array:", top_songs_array)
-        print("Top 5 Artists Array:", top_artists_array)
-        print("Top 5 Genres Array:", top_genres_array)
+        print("Top 10 Songs Array:", top_songs_array)
+        print("Top 10 Artists Array:", top_artists_array)
+        print("Top 10 Genres Array:", top_genres_array)
         print("Valence Array:", valence_array)
         print("Energy Array:", energy_array)
         print("Danceability Array:", danceability_array)
@@ -194,6 +194,7 @@ def get_songs():
 
         # Add data to Firebase
         firebase_response = add_spotify_data_to_firebase(
+            top_songs_array=top_songs_array,
             top_artists_array=top_artists_array,
             top_genres_array=top_genres_array,
             valence=average_valence,
@@ -229,7 +230,7 @@ def get_songs():
             <h1>🎵 Your Spotify Music Profile</h1>
             
             <div class="section">
-                <h2>🎶 Your Top 5 Tracks</h2>
+                <h2>🎶 Your Top 10 Tracks</h2>
         """
         
         for song in songs_info:
@@ -253,7 +254,7 @@ def get_songs():
             </div>
             
             <div class="section">
-                <h2>🎤 Your Top 5 Artists</h2>
+                <h2>🎤 Your Top 10 Artists</h2>
         """
         
         for artist in artists_info:
@@ -273,7 +274,7 @@ def get_songs():
             </div>
             
             <div class="section">
-                <h2>🎭 Your Top 5 Genres</h2>
+                <h2>🎭 Your Top 10 Genres</h2>
         """
         
         for genre in genres_info:
