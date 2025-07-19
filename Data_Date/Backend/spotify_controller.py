@@ -46,6 +46,7 @@ def home():
         return redirect(auth_url)
     return redirect(url_for('get_songs'))
 
+# Handle spotify when the user has already been there
 @app.route('/callback') 
 def callback(): 
     sp_oauth.get_access_token(request.args['code'])
@@ -64,6 +65,7 @@ def get_songs():
         # Extract song information and get audio features
         songs_info = []
         
+        # Get the top tracks
         for idx, track in enumerate(songs['items'], 1):
             song_data = {
                 'rank': idx,
@@ -137,7 +139,7 @@ def get_songs():
         for artist in all_artists['items']:
             for genre in artist['genres']:
                 genre_count[genre] = genre_count.get(genre, 0) + 1
-
+        
         top_genres = sorted(genre_count.items(), key=lambda x: x[1], reverse=True)[:10]
         genres_info = []
         for idx, (genre, count) in enumerate(top_genres, 1):
@@ -176,65 +178,8 @@ def get_songs():
             danceability=average_danceability,
             tempo=average_tempo,
             instrumentalness=average_instrumentalness,
-            user_id=session.get('user_id')
+            user_id=session.get('user_id') # Change this to corresponding user id 
         )
-        
-        # Create HTML response
-        html_content = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Your Spotify Data</title>
-            <style>
-                body {{ font-family: Arial, sans-serif; margin: 40px; background-color: #191414; color: #1db954; }}
-                h1, h2 {{ color: #1db954; }}
-                .song, .artist, .genre {{ margin: 10px 0; padding: 10px; background-color: #282828; border-radius: 5px; }}
-                .song-title, .artist-name, .genre-name {{ color: #ffffff; font-weight: bold; }}
-                .details {{ color: #b3b3b3; font-size: 14px; }}
-                .summary {{ background-color: #1db954; color: #191414; padding: 20px; border-radius: 10px; margin: 20px 0; }}
-                .close-btn {{ position: fixed; top: 20px; right: 20px; background: #1db954; color: #191414; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; }}
-            </style>
-        </head>
-        <body>
-            <button class="close-btn" onclick="window.close()">Close</button>
-            <h1>🎵 Your Spotify Music Profile</h1>
-            
-            <div class="summary">
-                <h2>📊 Your Music DNA</h2>
-                <p><strong>Valence (Happiness):</strong> {average_valence}</p>
-                <p><strong>Energy:</strong> {average_energy}</p>
-                <p><strong>Danceability:</strong> {average_danceability}</p>
-                <p><strong>Average Tempo:</strong> {average_tempo} BPM</p>
-                <p><strong>Instrumentalness:</strong> {average_instrumentalness}</p>
-            </div>
-            
-            <h2>🎵 Your Top Songs</h2>
-            {''.join([f'''
-            <div class="song">
-                <div class="song-title">#{song["rank"]} {song["name"]}</div>
-                <div class="details">by {song["artist"]} • {song["album"]}</div>
-                <div class="details">Energy: {song["energy"]} | Valence: {song["valence"]} | Tempo: {song["tempo"]} BPM</div>
-            </div>
-            ''' for song in songs_info])}
-            
-            <h2>🎤 Your Top Artists</h2>
-            {''.join([f'''
-            <div class="artist">
-                <div class="artist-name">#{artist["rank"]} {artist["name"]}</div>
-                <div class="details">Genres: {", ".join(artist["genres"])} • Popularity: {artist["popularity"]}</div>
-            </div>
-            ''' for artist in artists_info])}
-            
-            <h2>🎭 Your Top Genres</h2>
-            {''.join([f'''
-            <div class="genre">
-                <div class="genre-name">#{genre["rank"]} {genre["name"]}</div>
-                <div class="details">{genre["count"]} artists ({genre["percentage"]}% of your top artists)</div>
-            </div>
-            ''' for genre in genres_info])}
-        </body>
-        </html>
-        """
         
         # Print formatted data as requested
         if firebase_response.get('success') and firebase_response.get('user_id'):
@@ -245,7 +190,7 @@ def get_songs():
                 print(f"Data: {user_data}")
                 print("===========================\n")
         
-        return html_content
+        return redirect('http://localhost:5173/matches')
         
     except Exception as e:
         return f"<html><body><h1>Error: {str(e)}</h1></body></html>", 500
