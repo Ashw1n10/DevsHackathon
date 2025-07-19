@@ -122,3 +122,10 @@ div.lock {
   text-align: center;
   font-size: 2.25vh;
 }
+
+.navBtns {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}

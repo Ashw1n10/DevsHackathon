@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react'
 import styles from './styles/MatchesPage.module.css';
 import Logo from './assets/Logo.png'
-import PersonIcon from '@mui/icons-material/Person';
 import Disc from './assets/MusicDisc.png'
 import MatchProfilePopup from './MatchProfilePopup.jsx'
 
+import PersonIcon from '@mui/icons-material/Person';
+import ChatIcon from '@mui/icons-material/Chat';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 
 function MatchesPage() {
   const [spun, setSpun] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [spinsLeft, setSpinsLeft] = useState(50);
+  const [spinsLeft, setSpinsLeft] = useState(5);
   const [lastSpinDate, setLastSpinDate] = useState('');
   const [timeUntilNextDay, setTimeUntilNextDay] = useState('');
   const [showPopup, setShowPopup] = useState(false);
@@ -51,7 +53,7 @@ function MatchesPage() {
       // New day, reset spins
       setSpinsLeft(5);
       setLastSpinDate(today);
-      localStorage.setItem('spinsLeft', '50');
+      localStorage.setItem('spinsLeft', '5');
       localStorage.setItem('lastSpinDate', today);
     } else if (savedSpins) {
       // Same day, load saved spins
@@ -91,9 +93,18 @@ function MatchesPage() {
           </div>
           {/* <a href="" className={styles.about}>About</a> */}
         </div>
+        <div className={styles.navBtns}>
+        <button className={styles.login}>
+          <ChatIcon className={styles.icon} />
+        </button>
         <button className={styles.login}>
           <PersonIcon className={styles.icon} />
         </button>
+        <button className={styles.login}>
+          <SettingsIcon className={styles.icon} />
+        </button>
+        </div>
+
       </div>
 
       <div
