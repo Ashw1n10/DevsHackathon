@@ -22,6 +22,7 @@ function MatchesPage() {
 
   return (
     <>
+    <div className={styles.background}></div>
       <div className={styles.nav}>
         <div className={styles.leftNav}>
           <div>
