@@ -115,8 +115,8 @@ function MatchesPage() {
         )}
         {spinsLeft === 0 && (
           <div>
-            <p>Come back in:</p>
-            <p className={styles.countdown}>{timeUntilNextDay}</p>
+            <p>Come back in:            <span className={styles.countdown}>{timeUntilNextDay}</span>
+            </p>
           </div>
         )}
       </div>
