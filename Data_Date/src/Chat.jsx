@@ -2,6 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './styles/Chat.module.css';
 import Logo from './assets/Logo.png';
+import PersonIcon from '@mui/icons-material/Person';
+import ChatIcon from '@mui/icons-material/Chat';
+import HomeIcon from '@mui/icons-material/Home';
 
 function Chat() {
   const navigate = useNavigate();
@@ -17,6 +20,10 @@ function Chat() {
 
   const handleMatchesClick = () => {
     navigate('/matches');
+  };
+
+  const handleChatClick = () => {
+    navigate('/chat');
   };
 
   const [messages, setMessages] = useState([
@@ -137,11 +144,18 @@ function Chat() {
           <div>
             <img src={Logo} alt="Logo" className={styles.logo} />
           </div>
-          <button onClick={handleHomeClick} className={styles.about}>Home</button>
-          <button onClick={handleProfileClick} className={styles.about}>Profile</button>
-          <button onClick={handleMatchesClick} className={styles.about}>🎵 Matches</button>
         </div>
-        <button className={styles.login}>Login</button>
+        <div className={styles.navBtns}>
+          <button className={styles.login} onClick={handleMatchesClick}>
+            <HomeIcon className={styles.icon} />
+          </button>
+          <button className={`${styles.login} ${styles.profileIcon}`} onClick={handleChatClick}>
+            <ChatIcon className={styles.icon} />
+          </button>
+          <button className={styles.login} onClick={handleProfileClick}>
+            <PersonIcon className={styles.icon} />
+          </button>
+        </div>
       </div>
 
       {/* Chat Header */}

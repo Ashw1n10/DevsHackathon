@@ -7,6 +7,18 @@
   color: #ffffff;
 }
 
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  padding: 10px;
+}
+
+.logo {
+  width: 120px;
+}
+
 /* Chat Header */
 .chat-header {
   background-color: #282828;
@@ -260,3 +272,30 @@
     padding: 15px;
   }
 }
+
+.navBtns .login {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 0;
+  background-color: #fff;
+  color: #050100;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: all 0.3s;
+  /* display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row; */
+}
+
+.navBtns .login:hover {
+  background-color: #16d35ee7;
+  color: #fff;
+  border-radius: 25px;
+  transition: all 0.3s;
+}
+
+.profileIcon {
+  opacity: 0.6;
+}
+
