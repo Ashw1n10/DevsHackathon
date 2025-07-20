@@ -1,0 +1,48 @@
+{
+  "user_id": "user_1752972792",
+  "export_date": "2025-07-20T01:05:35.147369",
+  "matches": [
+    {
+      "user_id": "user_1752972709",
+      "audio_score": 0.997,
+      "artist_score": 0.0,
+      "song_score": 0.0,
+      "combined_score": 0.499
+    },
+    {
+      "user_id": "user_1752932592",
+      "audio_score": 0.994,
+      "artist_score": 0.0,
+      "song_score": 0.0,
+      "combined_score": 0.497
+    },
+    {
+      "user_id": "user_1752972966",
+      "audio_score": 0.994,
+      "artist_score": 0.0,
+      "song_score": 0.0,
+      "combined_score": 0.497
+    },
+    {
+      "user_id": "user_1752910020",
+      "audio_score": 0.991,
+      "artist_score": 0.0,
+      "song_score": 0.0,
+      "combined_score": 0.495
+    },
+    {
+      "user_id": "user_1752972749",
+      "audio_score": 0.991,
+      "artist_score": 0.0,
+      "song_score": 0.0,
+      "combined_score": 0.495
+    },
+    {
+      "user_id": "user_1752971401",
+      "audio_score": 0.987,
+      "artist_score": 0.0,
+      "song_score": 0.0,
+      "combined_score": 0.494
+    }
+  ]
+}
