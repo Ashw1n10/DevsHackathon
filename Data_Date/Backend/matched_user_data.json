@@ -1,0 +1,90 @@
+{
+  "user_id": "user_1752972792",
+  "export_date": "2025-07-20T01:19:46.135773",
+  "matches": [
+    {
+      "user_id": "user_1752972709",
+      "audio_score": 0.997,
+      "artist_score": 0.0,
+      "song_score": 0.0,
+      "combined_score": 0.499,
+      "top_songs": [
+        "Aashiqui (The Love Theme)",
+        "Ishq Mein - From Nadaaniyan",
+        "Finding Her",
+        "Afsos",
+        "Jhol"
+      ]
+    },
+    {
+      "user_id": "user_1752932592",
+      "audio_score": 0.994,
+      "artist_score": 0.0,
+      "song_score": 0.0,
+      "combined_score": 0.497,
+      "top_songs": [
+        "VAMO FUNK",
+        "PASSO BEM SOLTO - Super Slowed",
+        "MENTE M",
+        "U",
+        "Dark Thoughts"
+      ]
+    },
+    {
+      "user_id": "user_1752972966",
+      "audio_score": 0.994,
+      "artist_score": 0.0,
+      "song_score": 0.0,
+      "combined_score": 0.497,
+      "top_songs": [
+        "Beaches",
+        "Cologne",
+        "TBH",
+        "real",
+        "The Morning"
+      ]
+    },
+    {
+      "user_id": "user_1752910020",
+      "audio_score": 0.991,
+      "artist_score": 0.0,
+      "song_score": 0.0,
+      "combined_score": 0.495,
+      "top_songs": [
+        "Soft Spot",
+        "Cho Em Quen Tuoi Ngoc",
+        "Plastic Love",
+        "XO (Only If You Say Yes) (English Ver.) Feat. JVKE",
+        "The Winner Takes It All"
+      ]
+    },
+    {
+      "user_id": "user_1752972749",
+      "audio_score": 0.991,
+      "artist_score": 0.0,
+      "song_score": 0.0,
+      "combined_score": 0.495,
+      "top_songs": [
+        "More",
+        "Lyfestyle (with Lil Wayne)",
+        "GONE 4 A MIN",
+        "Save That Shit",
+        "THE SCOTTS"
+      ]
+    },
+    {
+      "user_id": "user_1752971401",
+      "audio_score": 0.987,
+      "artist_score": 0.0,
+      "song_score": 0.0,
+      "combined_score": 0.494,
+      "top_songs": [
+        "untitled 02 | 06.23.2014.",
+        "No One Noticed",
+        "Winter Wonderland",
+        "Weston Road Flows",
+        "Grown Simba"
+      ]
+    }
+  ]
+}

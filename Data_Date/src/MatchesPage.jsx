@@ -43,6 +43,7 @@ function MatchesPage() {
   const [matchData, setMatchData] = useState(null);
   const [partnerData, setPartnerData] = useState(null);
   const [formattedUserData, setFormattedUserData] = useState(null);
+  const [matchedUserData, setMatchedUserData] = useState(null);
 
   // Function to read formatted user data from JSON file
   const readFormattedUserData = async () => {
@@ -63,9 +64,29 @@ function MatchesPage() {
     }
   };
 
+  // Function to read matched user data from JSON file
+  const readMatchedUserData = async () => {
+    try {
+      const response = await fetch('/backend/matched_user_data.json');
+      if (response.ok) {
+        const data = await response.json();
+        console.log('💕 Matched User Data from JSON:', data);
+        setMatchedUserData(data);
+        return data;
+      } else {
+        console.log('❌ Could not read matched_user_data.json - file may not exist yet');
+        return null;
+      }
+    } catch (error) {
+      console.error('❌ Error reading matched user data:', error);
+      return null;
+    }
+  };
+
   // Load formatted user data on component mount
   useEffect(() => {
     readFormattedUserData();
+    readMatchedUserData();
   }, []);
 
   // Function to get match data for current user
