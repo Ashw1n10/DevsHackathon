@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom';
 import styles from './styles/MatchesPage.module.css';
 import Logo from './assets/Logo.png'
 import Disc from './assets/MusicDisc.png'
 import MatchProfilePopup from './MatchProfilePopup.jsx'
+import Chat from './Chat.jsx';
 
 import PersonIcon from '@mui/icons-material/Person';
 import ChatIcon from '@mui/icons-material/Chat';
@@ -16,6 +18,8 @@ function MatchesPage() {
   const [lastSpinDate, setLastSpinDate] = useState('');
   const [timeUntilNextDay, setTimeUntilNextDay] = useState('');
   const [showPopup, setShowPopup] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const navigate = useNavigate();
 
   // Calculate time until next day
   const calculateTimeUntilNextDay = () => {
@@ -94,15 +98,15 @@ function MatchesPage() {
           {/* <a href="" className={styles.about}>About</a> */}
         </div>
         <div className={styles.navBtns}>
-        <button className={styles.login}>
-          <ChatIcon className={styles.icon} />
-        </button>
-        <button className={styles.login}>
-          <PersonIcon className={styles.icon} />
-        </button>
-        <button className={styles.login}>
-          <SettingsIcon className={styles.icon} />
-        </button>
+          <button className={styles.login} onClick={() => navigate('/chat')}>
+            <ChatIcon className={styles.icon} />
+          </button>
+          <button className={styles.login}>
+            <PersonIcon className={styles.icon} />
+          </button>
+          <button className={styles.login}>
+            <SettingsIcon className={styles.icon} />
+          </button>
         </div>
 
       </div>
@@ -149,7 +153,9 @@ function MatchesPage() {
           }}
         />
       )}
-
+      {showChat && (
+        <Chat onNavigate={() => setShowChat(false)} />
+      )}
 
     </>
   )
