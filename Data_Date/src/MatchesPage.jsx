@@ -265,6 +265,9 @@ function MatchesPage() {
               setShowPopup(false);
             }, 500);
           }}
+          matchData={matchData}
+          partnerData={partnerData}
+          matchedUserData={matchedUserData}
         />
       )}
 

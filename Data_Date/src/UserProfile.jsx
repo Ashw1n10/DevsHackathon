@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './styles/UserProfile.module.css'
 import Logo from './assets/Logo.png'
@@ -9,6 +9,35 @@ import HomeIcon from '@mui/icons-material/Home';
 
 function UserProfile() {
   const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Function to read formatted user data from JSON file
+  const readFormattedUserData = async () => {
+    try {
+      const response = await fetch('/backend/formatted_user_data.json');
+      if (response.ok) {
+        const data = await response.json();
+        console.log('📄 User Profile Data from JSON:', data);
+        setUserData(data.data); // Access the 'data' property from the JSON structure
+        setLoading(false);
+        return data;
+      } else {
+        console.log('❌ Could not read formatted_user_data.json - file may not exist yet');
+        setLoading(false);
+        return null;
+      }
+    } catch (error) {
+      console.error('❌ Error reading formatted user data:', error);
+      setLoading(false);
+      return null;
+    }
+  };
+
+  // Load user data on component mount
+  useEffect(() => {
+    readFormattedUserData();
+  }, []);
 
   // Navigation handlers
   const handleProfileClick = () => {
@@ -23,8 +52,14 @@ function UserProfile() {
     navigate('/matches');
   };
 
-  // Placeholder data for top 10 artists
-  const topArtists = [
+  // Format real data from JSON or use placeholder data as fallback
+  const topArtists = userData?.top_artists?.map((artist, index) => ({
+    rank: index + 1,
+    name: artist,
+    genres: ["Unknown"], // Placeholder since genres aren't in the data
+    popularity: 90,
+    followers: 1000000
+  })) || [
     { rank: 1, name: "The Weeknd", genres: ["Pop", "R&B", "Alternative R&B"], popularity: 100, followers: 15234567 },
     { rank: 2, name: "Dua Lipa", genres: ["Pop", "Dance Pop", "UK Pop"], popularity: 98, followers: 12543876 },
     { rank: 3, name: "Harry Styles", genres: ["Pop", "Pop Rock", "UK Pop"], popularity: 97, followers: 11876543 },
@@ -37,8 +72,12 @@ function UserProfile() {
     { rank: 10, name: "Ariana Grande", genres: ["Pop", "Dance Pop", "R&B"], popularity: 98, followers: 16789012 }
   ];
 
-  // Placeholder data for top 10 genres
-  const topGenres = [
+  const topGenres = userData?.top_genres?.map((genre, index) => ({
+    rank: index + 1,
+    name: genre,
+    count: 1,
+    percentage: 100 - (index * 10)
+  })) || [
     { rank: 1, name: "Pop", count: 18, percentage: 90.0 },
     { rank: 2, name: "Dance Pop", count: 12, percentage: 60.0 },
     { rank: 3, name: "R&B", count: 8, percentage: 40.0 },
@@ -51,8 +90,13 @@ function UserProfile() {
     { rank: 10, name: "Indie Pop", count: 2, percentage: 10.0 }
   ];
 
-  // Placeholder data for top 10 songs
-  const topSongs = [
+  const topSongs = userData?.top_songs?.map((song, index) => ({
+    rank: index + 1,
+    name: typeof song === 'string' ? song : song.name,
+    artist: typeof song === 'string' ? 'Unknown Artist' : song.artist,
+    album: "Unknown Album",
+    duration: "3:00"
+  })) || [
     { rank: 1, name: "Blinding Lights", artist: "The Weeknd", album: "After Hours", duration: "3:20" },
     { rank: 2, name: "Levitating", artist: "Dua Lipa", album: "Future Nostalgia", duration: "3:23" },
     { rank: 3, name: "As It Was", artist: "Harry Styles", album: "Harry's House", duration: "2:47" },
@@ -64,6 +108,23 @@ function UserProfile() {
     { rank: 9, name: "We Don't Talk About Bruno", artist: "Carolina Gaitán", album: "Encanto", duration: "3:36" },
     { rank: 10, name: "Break My Soul", artist: "Beyoncé", album: "RENAISSANCE", duration: "4:38" }
   ];
+
+  if (loading) {
+    return (
+      <div className={styles.background}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '100vh',
+          color: 'white',
+          fontSize: '1.2rem'
+        }}>
+          Loading your music profile...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
