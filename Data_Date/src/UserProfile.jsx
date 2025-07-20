@@ -3,12 +3,16 @@ import { useNavigate } from 'react-router-dom'
 import styles from './styles/UserProfile.module.css'
 import Logo from './assets/Logo.png'
 
+import PersonIcon from '@mui/icons-material/Person';
+import ChatIcon from '@mui/icons-material/Chat';
+import HomeIcon from '@mui/icons-material/Home';
+
 function UserProfile() {
   const navigate = useNavigate();
 
   // Navigation handlers
-  const handleHomeClick = () => {
-    navigate('/');
+  const handleProfileClick = () => {
+    navigate('/profile');
   };
 
   const handleChatClick = () => {
@@ -63,16 +67,28 @@ function UserProfile() {
 
   return (
     <>
+      <div className={styles.background}></div>
       <div className={styles.nav}>
         <div className={styles.leftNav}>
           <div>
-            <img src={Logo} alt="Logo" className={styles.logo} />
+            <img 
+              src={Logo} 
+              alt="Logo" 
+              className={styles.logo} 
+            />
           </div>
-          <button onClick={handleHomeClick} className={styles.about}>Home</button>
-          <button onClick={handleChatClick} className={styles.about}>💬 Chat</button>
-          <button onClick={handleMatchesClick} className={styles.about}>🎵 Matches</button>
         </div>
-        <button className={styles.login}>Login</button>
+        <div className={styles.navBtns}>
+          <button className={styles.login} onClick={handleMatchesClick}>
+            <HomeIcon className={styles.icon} />
+          </button>
+          <button className={styles.login} onClick={handleChatClick}>
+            <ChatIcon className={styles.icon} />
+          </button>
+          <button className={`${styles.login} ${styles.profileIcon}`} onClick={handleProfileClick}>
+            <PersonIcon className={styles.icon} />
+          </button>
+        </div>
       </div>
       
       <div className={styles.profileContainer}>
