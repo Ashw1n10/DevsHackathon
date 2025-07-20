@@ -1,8 +1,24 @@
 import React from 'react'
-import styles from './styles/UserProfile.css'
+import { useNavigate } from 'react-router-dom'
+import styles from './styles/UserProfile.module.css'
 import Logo from './assets/Logo.png'
 
-function UserProfile({ onNavigate = () => {} }) {
+function UserProfile() {
+  const navigate = useNavigate();
+
+  // Navigation handlers
+  const handleHomeClick = () => {
+    navigate('/');
+  };
+
+  const handleChatClick = () => {
+    navigate('/chat');
+  };
+
+  const handleMatchesClick = () => {
+    navigate('/matches');
+  };
+
   // Placeholder data for top 10 artists
   const topArtists = [
     { rank: 1, name: "The Weeknd", genres: ["Pop", "R&B", "Alternative R&B"], popularity: 100, followers: 15234567 },
@@ -52,8 +68,9 @@ function UserProfile({ onNavigate = () => {} }) {
           <div>
             <img src={Logo} alt="Logo" className={styles.logo} />
           </div>
-          <button onClick={() => onNavigate('landing')} className={styles.about}>Home</button>
-          <button onClick={() => onNavigate('chat')} className={styles.about}>💬 Chat</button>
+          <button onClick={handleHomeClick} className={styles.about}>Home</button>
+          <button onClick={handleChatClick} className={styles.about}>💬 Chat</button>
+          <button onClick={handleMatchesClick} className={styles.about}>🎵 Matches</button>
         </div>
         <button className={styles.login}>Login</button>
       </div>
