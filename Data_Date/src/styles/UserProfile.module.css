@@ -7,6 +7,7 @@ body {
   color: #050100;
   background-color: #242424;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .background {
