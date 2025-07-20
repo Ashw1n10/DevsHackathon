@@ -29,7 +29,6 @@ const firebaseConfig = {
 
 };
 
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -42,6 +41,32 @@ function MatchesPage() {
   const [timeUntilNextDay, setTimeUntilNextDay] = useState('');
   const [showPopup, setShowPopup] = useState(false);
   const [matchData, setMatchData] = useState(null);
+  const [partnerData, setPartnerData] = useState(null);
+  const [formattedUserData, setFormattedUserData] = useState(null);
+
+  // Function to read formatted user data from JSON file
+  const readFormattedUserData = async () => {
+    try {
+      const response = await fetch('/backend/formatted_user_data.json');
+      if (response.ok) {
+        const data = await response.json();
+        console.log('📄 Formatted User Data from JSON:', data);
+        setFormattedUserData(data);
+        return data;
+      } else {
+        console.log('❌ Could not read formatted_user_data.json - file may not exist yet');
+        return null;
+      }
+    } catch (error) {
+      console.error('❌ Error reading formatted user data:', error);
+      return null;
+    }
+  };
+
+  // Load formatted user data on component mount
+  useEffect(() => {
+    readFormattedUserData();
+  }, []);
 
   // Function to get match data for current user
   const getMatchData = async (userId) => {
