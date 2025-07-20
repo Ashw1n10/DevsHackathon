@@ -9,6 +9,7 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import PersonIcon from '@mui/icons-material/Person';
 import ChatIcon from '@mui/icons-material/Chat';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { useNavigate } from 'react-router-dom';
 
 // Firebase configuration - you'll need to add your config here
 const firebaseConfig = {
@@ -88,6 +89,18 @@ function MatchesPage() {
     readFormattedUserData();
     readMatchedUserData();
   }, []);
+
+
+  // Navigation functions 
+  const navigate = useNavigate(); 
+
+  const handleChatClick = () => {
+    navigate('/chat');
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
 
   // Function to get match data for current user
   const getMatchData = async (userId) => {
@@ -199,10 +212,10 @@ function MatchesPage() {
           {/* <a href="" className={styles.about}>About</a> */}
         </div>
         <div className={styles.navBtns}>
-        <button className={styles.login}>
+        <button className={styles.login} onClick={handleChatClick}>
           <ChatIcon className={styles.icon} />
         </button>
-        <button className={styles.login}>
+        <button className={styles.login} onClick={handleProfileClick}>
           <PersonIcon className={styles.icon} />
         </button>
         <button className={styles.login}>

@@ -1,8 +1,24 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styles from './styles/Chat.css';
+import { useNavigate } from 'react-router-dom';
+import styles from './styles/Chat.module.css';
 import Logo from './assets/Logo.png';
 
-function Chat({ onNavigate = () => {} }) {
+function Chat() {
+  const navigate = useNavigate();
+
+  // Navigation handlers
+  const handleHomeClick = () => {
+    navigate('/');
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
+
+  const handleMatchesClick = () => {
+    navigate('/matches');
+  };
+
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -121,8 +137,9 @@ function Chat({ onNavigate = () => {} }) {
           <div>
             <img src={Logo} alt="Logo" className={styles.logo} />
           </div>
-          <button onClick={() => onNavigate('landing')} className={styles.about}>Home</button>
-          <button onClick={() => onNavigate('profile')} className={styles.about}>Profile</button>
+          <button onClick={handleHomeClick} className={styles.about}>Home</button>
+          <button onClick={handleProfileClick} className={styles.about}>Profile</button>
+          <button onClick={handleMatchesClick} className={styles.about}>🎵 Matches</button>
         </div>
         <button className={styles.login}>Login</button>
       </div>
