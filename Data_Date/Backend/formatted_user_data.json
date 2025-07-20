@@ -1,0 +1,39 @@
+{
+  "user_id": "user_1752972790",
+  "export_date": "2025-07-20T12:53:35.440810",
+  "data": {
+    "valence": 0.482,
+    "energy": 0.317,
+    "danceability": 0.477,
+    "tempo": 131.3,
+    "instrumentalness": 0.212,
+    "top_genres": [
+      "Bedroom Pop",
+      "Indie"
+    ],
+    "top_artists": [
+      "Conan Gray",
+      "mj apanay",
+      "asumuh",
+      "yung kai",
+      "HYBS",
+      "eaJ",
+      "Wallows",
+      "MICO",
+      "Jace June",
+      "One Direction"
+    ],
+    "top_songs": [
+      "Little Bit Better",
+      "blue",
+      "End of Beginning",
+      "Heavy",
+      "love you not",
+      "Was It Real",
+      "Restart",
+      "The Man Who Can't Be Moved",
+      "THE SNAKE",
+      "dance partner"
+    ]
+  }
+}

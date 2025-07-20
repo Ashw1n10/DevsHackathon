@@ -3,11 +3,36 @@ import styles from './styles/MatchesPage.module.css';
 import Logo from './assets/Logo.png'
 import Disc from './assets/MusicDisc.png'
 import MatchProfilePopup from './MatchProfilePopup.jsx'
+import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
 import PersonIcon from '@mui/icons-material/Person';
 import ChatIcon from '@mui/icons-material/Chat';
 import SettingsIcon from '@mui/icons-material/Settings';
 
+// Firebase configuration - you'll need to add your config here
+const firebaseConfig = {
+
+  apiKey: "AIzaSyDNolPG0ctmP4Em-bmbIovf6xIFNheSNFA",
+
+  authDomain: "datadate-8d8df.firebaseapp.com",
+
+  projectId: "datadate-8d8df",
+
+  storageBucket: "datadate-8d8df.firebasestorage.app",
+
+  messagingSenderId: "1014942815328",
+
+  appId: "1:1014942815328:web:1204006f8629f61f70df05",
+
+  measurementId: "G-G7CDMYYDVE"
+
+};
+
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 function MatchesPage() {
   const [spun, setSpun] = useState(false);
@@ -16,6 +41,40 @@ function MatchesPage() {
   const [lastSpinDate, setLastSpinDate] = useState('');
   const [timeUntilNextDay, setTimeUntilNextDay] = useState('');
   const [showPopup, setShowPopup] = useState(false);
+  const [matchData, setMatchData] = useState(null);
+
+  // Function to get match data for current user
+  const getMatchData = async (userId) => {
+    try {
+      const matchDocRef = doc(db, 'matches_collection', userId);
+      const matchDoc = await getDoc(matchDocRef);
+      
+      if (matchDoc.exists()) {
+        const data = matchDoc.data();
+        setMatchData(data);
+        console.log('Match data:', data);
+        return data;
+      } else {
+        console.log('No match found for user:', userId);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error getting match data:', error);
+      return null;
+    }
+  };
+
+  // Get current user ID (you'll need to implement user authentication)
+  const getCurrentUserId = () => {
+    // For now, using a placeholder - implement your user auth logic
+    return 'user_1752893653'; // Replace with actual user ID
+  };
+
+  // Load match data on component mount
+  useEffect(() => {
+    const userId = getCurrentUserId();
+    getMatchData(userId);
+  }, []);
 
   // Calculate time until next day
   const calculateTimeUntilNextDay = () => {

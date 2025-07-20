@@ -91,7 +91,7 @@ def add_spotify_data_to_firebase(top_songs_array, top_artists_array, top_genres_
 
 def get_user_spotify_data(user_id): 
     """
-    Retrieve user's Spotify data from Firestore
+    Retrieve user's Spotify data from Firestore and automatically save to file
     
     Args:
         user_id (str): User identifier
@@ -118,6 +118,13 @@ def get_user_spotify_data(user_id):
                 "top_artists": raw_data.get('top_artists', []),
                 "top_songs": raw_data.get('top_songs', [])
             }
+            
+            # Automatically save to file when data is retrieved
+            save_result = save_user_data_to_file(user_id)
+            if save_result['success']:
+                print(f"💾 Data automatically saved to: {save_result['filename']}")
+            else:
+                print(f"⚠️ Warning: Could not save to file: {save_result['message']}")
             
             return formatted_data
         else:
@@ -202,4 +209,120 @@ def update_user_match(user_id, partner_id, score):
         'partner': partner_id,
         'score': score
     })
+
+def save_user_data_to_file(user_id, filename='formatted_user_data.json'):
+    """
+    Retrieve user's Spotify data from Firestore and save to a formatted JSON file
+    Always overwrites the same file
+    
+    Args:
+        user_id (str): User identifier
+        filename (str): Filename to save to (defaults to 'formatted_user_data.json')
+        
+    Returns:
+        dict: Success status and file path
+    """
+    try:
+        # Get user data from Firestore
+        user_data = get_user_spotify_data(user_id)
+        
+        if user_data is None:
+            return {
+                'success': False,
+                'error': 'No user data found',
+                'message': f'No data found for user: {user_id}'
+            }
+        
+        # Add metadata
+        formatted_data = {
+            'user_id': user_id,
+            'export_date': datetime.datetime.now().isoformat(),
+            'data': user_data
+        }
+        
+        # Always overwrite the file
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(formatted_data, f, indent=2, ensure_ascii=False)
+        
+        print(f"✅ User data overwritten in: {filename}")
+        print(f"📊 Data includes: {len(user_data.get('top_artists', []))} artists, {len(user_data.get('top_genres', []))} genres, {len(user_data.get('top_songs', []))} songs")
+        
+        return {
+            'success': True,
+            'filename': filename,
+            'file_path': os.path.abspath(filename),
+            'message': f'User data successfully overwritten in {filename}'
+        }
+        
+    except Exception as e:
+        error_msg = f"❌ Error saving user data to file: {str(e)}"
+        print(error_msg)
+        return {
+            'success': False,
+            'error': str(e),
+            'message': error_msg
+        }
+
+def save_all_users_to_files(output_dir='user_exports'):
+    """
+    Save all users' data to separate JSON files in a directory
+    Always overwrites existing files
+    
+    Args:
+        output_dir (str): Directory to save files (will be created if doesn't exist)
+        
+    Returns:
+        dict: Success status and list of saved files
+    """
+    try:
+        # Create output directory if it doesn't exist
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Get all users' data
+        all_data = get_all_spotify_data()
+        
+        if not all_data:
+            return {
+                'success': False,
+                'error': 'No data found',
+                'message': 'No user data found in Firestore'
+            }
+        
+        saved_files = []
+        
+        for user_id, user_data in all_data.items():
+            filename = os.path.join(output_dir, f'user_data_{user_id}.json')
+            
+            # Add metadata
+            formatted_data = {
+                'user_id': user_id,
+                'export_date': datetime.datetime.now().isoformat(),
+                'data': user_data
+            }
+            
+            # Always overwrite the file
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(formatted_data, f, indent=2, ensure_ascii=False)
+            
+            saved_files.append(filename)
+            print(f"✅ Data for user {user_id} overwritten in {filename}")
+        
+        print(f"📁 All user data overwritten in {output_dir}/ directory")
+        
+        return {
+            'success': True,
+            'output_dir': output_dir,
+            'files_saved': len(saved_files),
+            'saved_files': saved_files,
+            'message': f'Successfully overwrote {len(saved_files)} user files in {output_dir}/'
+        }
+        
+    except Exception as e:
+        error_msg = f"❌ Error saving all users to files: {str(e)}"
+        print(error_msg)
+        return {
+            'success': False,
+            'error': str(e),
+            'message': error_msg
+        }
 
